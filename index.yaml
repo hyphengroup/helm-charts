@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  private-charts-repo:
+  - apiVersion: v1
+    appVersion: "1.0"
+    created: 2019-10-17T14:35:12.926448+08:00
+    description: Nodejs http server clones a private GitHub or BitBucket repo and
+      serves the files.
+    digest: c315fd36de8c2090146d0a22dbc10e0a9aea45da4d21cf7a2039c5e11dcaafde
+    name: private-charts-repo
+    urls:
+    - https://compareasiagroup.github.io/helm-charts/private-charts-repo-0.0.1.tgz
+    version: 0.0.1
+generated: 2019-10-17T14:35:12.925904+08:00
