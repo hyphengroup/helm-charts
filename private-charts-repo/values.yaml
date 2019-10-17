@@ -1,0 +1,16 @@
+image: torosent/private-charts-repo:latest
+containerPort: 8080
+name: private-charts-repository
+serviceName: private-charts-repository
+servicePort: 80
+replicas: 1
+
+# supports github or bitbucket
+gitType: github # default is github
+# repo to clone
+gitRepo: https://github.com/example/example.git
+
+# secret with credentials
+gitSecretName: private-charts-repository-secrets
+gitUsernameSecretKey: username
+gitPasswordSecretKey: password
