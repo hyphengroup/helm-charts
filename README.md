@@ -14,7 +14,7 @@ git fetch
 git checkout gh-pages
 ```
 
-Pushing a chart changes:
+Pushing chart changes:
 ```
 $ helm package private-charts-repo/ -d gh-pages/
 Successfully packaged chart and saved it to: gh-pages/private-charts-repo-0.0.1.tgz
