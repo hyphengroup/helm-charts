@@ -1,0 +1,197 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "airflow-kube-s3.fullname" . }}-scheduler
+  labels: {{ include "airflow-kube-s3.labels" . | nindent 4 }}
+    app.kubernetes.io/component: scheduler
+spec:
+  selector:
+    matchLabels: {{ include "airflow-kube-s3.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: scheduler
+  # Always run exactly 1 scheduler
+  replicas: 1
+  strategy:
+    # Kill the scheduler as soon as possible. It will restart quickly with all the workers,
+    # minimizing the time they are not synchronized.
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 100%
+  template:
+    metadata:
+      annotations:
+        checksum/cm-config: {{ include (print $.Template.BasePath "/cm-config.yaml") . | sha256sum }}
+        checksum/cm-env: {{ include (print $.Template.BasePath "/cm-env.yaml") . | sha256sum }}
+        checksum/cm-scripts: {{ include (print $.Template.BasePath "/cm-scripts.yaml") . | sha256sum }}
+        {{- if .Values.airflow.secrets.create }}
+        checksum/secret-env: {{ include (print $.Template.BasePath "/secret-env.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if or .Values.airflow.connections (and .Values.airflow.rbac.enabled .Values.airflow.rbac.users) }}
+        checksum/secret-scripts: {{ include (print $.Template.BasePath "/secret-scripts.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.airflow.rbac.enabled }}
+        checksum/secret-web: {{ include (print $.Template.BasePath "/secret-web.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.airflow.podAnnotations }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
+        {{- with .Values.airflow.scheduler.podAnnotations }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
+      labels: {{ include "airflow-kube-s3.labels" . | nindent 8 }}
+        app.kubernetes.io/component: scheduler
+    spec:
+      serviceAccountName: {{ template "airflow-kube-s3.serviceAccountName" . }}
+      securityContext:
+        fsGroup: 1000
+      restartPolicy: Always
+      initContainers:
+        - name: "init-airflow"
+          image: {{ .Values.airflow.image.repository }}:{{ .Values.airflow.image.tag }}
+          imagePullPolicy: {{ .Values.airflow.image.pullPolicy }}
+          volumeMounts:
+            - name: airflow-config
+              mountPath: /usr/local/airflow/airflow.cfg
+              subPath: airflow.cfg
+            - name: airflow-scripts
+              mountPath: /usr/local/airflow/scripts/init-airflow.sh
+              subPath: init-airflow.sh
+            {{- if .Values.airflow.connections }}
+            - name: airflow-secret-scripts
+              mountPath: /usr/local/airflow/scripts/add-connections.sh
+              subPath: add-connections.sh
+            {{-  end }}
+            {{- if .Values.airflow.rbac.enabled }}
+            {{- if .Values.airflow.rbac.users }}
+            - name: airflow-secret-scripts
+              mountPath: /usr/local/airflow/scripts/add-users.sh
+              subPath: add-users.sh
+            {{-  end }}
+            - name: webserver-config
+              mountPath: /usr/local/airflow/webserver_config.py
+              subPath: webserver_config.py
+            {{-  end }}
+          envFrom:
+            {{- range .Values.airflow.envFrom.configMaps }}
+            - configMapRef:
+                name: {{ . }}
+            {{- end }}
+            {{- range .Values.airflow.envFrom.secrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            - configMapRef:
+                name: {{ template "airflow-kube-s3.fullname" . }}-env
+            {{- if .Values.airflow.secrets.create }}
+            - secretRef:
+                name: {{ template "airflow-kube-s3.fullname" . }}-env
+            {{- end }}
+          command:
+            - "/usr/local/airflow/scripts/init-airflow.sh"
+          resources:
+            {{- toYaml .Values.airflow.scheduler.resources | trim | nindent 12 }}
+      containers:
+        - name: git-sync
+          image: {{ .Values.airflow.dags.git.image.repository}}:{{ .Values.airflow.dags.git.image.tag}}
+          imagePullPolicy: {{ .Values.airflow.dags.git.image.pullPolicy | quote }}
+          volumeMounts:
+            - name: airflow-dags
+              mountPath: {{ .Values.airflow.dags.git.root }}
+            - name: git-sync-ssh-configmap
+              mountPath: /etc/git-secret/known_hosts
+              subPath: known_hosts
+            - name: git-sync-ssh-secrets
+              mountPath: /etc/git-secret/ssh
+              subPath: ssh
+          env:
+            - name: GIT_SYNC_REPO
+              value: {{ .Values.airflow.dags.git.url }}
+            - name: GIT_SYNC_BRANCH
+              value: {{ .Values.airflow.dags.git.branch }}
+            - name: GIT_SYNC_ROOT
+              value: {{ .Values.airflow.dags.git.root }}
+            - name: GIT_SYNC_DEST
+              value: {{ .Values.airflow.dags.git.dest }}
+              # the number of seconds between syncs
+            - name: GIT_SYNC_WAIT
+              value: {{ .Values.airflow.dags.git.wait | quote }}
+              # using secret and configmap for cloning over SSH
+            - name: GIT_SSH_KEY_FILE
+              value: /etc/git-secret/ssh
+            - name: GIT_SYNC_SSH
+              value: "true"
+            - name: GIT_KNOWN_HOSTS
+              value: "true"
+            - name: GIT_SSH_KNOWN_HOSTS_FILE
+              value: /etc/git-secret/known_hosts
+          resources:
+            {{- toYaml .Values.airflow.dags.git.resources | trim | nindent 12 }}
+        - name: scheduler
+          image: {{ .Values.airflow.image.repository }}:{{ .Values.airflow.image.tag }}
+          imagePullPolicy: {{ .Values.airflow.image.pullPolicy }}
+          args: ["scheduler"]
+          envFrom:
+            {{- range .Values.airflow.envFrom.configMaps }}
+            - configMapRef:
+                name: {{ . }}
+            {{- end }}
+            {{- range .Values.airflow.envFrom.secrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            - configMapRef:
+                name: {{ template "airflow-kube-s3.fullname" . }}-env
+            {{- if .Values.airflow.secrets.create }}
+            - secretRef:
+                name: {{ template "airflow-kube-s3.fullname" . }}-env
+            {{- end }}
+          env:
+            - name: AIRFLOW__KUBERNETES__NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {{- toYaml .Values.airflow.scheduler.resources | trim | nindent 12 }}
+          volumeMounts:
+            - name: airflow-config
+              mountPath: /usr/local/airflow/airflow.cfg
+              subPath: airflow.cfg
+            - name: airflow-dags
+              mountPath: {{ .Values.airflow.dags.git.folderMountPoint }}
+            {{- if .Values.airflow.rbac.enabled }}
+            - name: webserver-config
+              mountPath: /usr/local/airflow/webserver_config.py
+              subPath: webserver_config.py
+            {{- end }}
+      volumes:
+        - name: airflow-dags
+          emptyDir: {}
+        - name: airflow-config
+          configMap:
+            name: {{ template "airflow-kube-s3.fullname" . }}-config
+        - name: airflow-scripts
+          configMap:
+            name: {{ template "airflow-kube-s3.fullname" . }}-scripts
+            defaultMode: 0755
+        {{- if or .Values.airflow.connections (and .Values.airflow.rbac.enabled .Values.airflow.rbac.users) }}
+        - name: airflow-secret-scripts
+          secret:
+            secretName: {{ template "airflow-kube-s3.fullname" . }}-scripts
+            defaultMode: 0755
+        {{- end }}
+        {{- if .Values.airflow.rbac.enabled }}
+        - name: webserver-config
+          secret:
+            secretName: {{ template "airflow-kube-s3.fullname" . }}-web
+        {{- end }}
+        - name: git-sync-ssh-configmap
+          configMap:
+            name: {{ .Values.airflow.dags.git.ssh.knownHostsConfigMapRef }}
+            defaultMode: 0440
+        - name: git-sync-ssh-secrets
+          secret:
+            secretName: {{ .Values.airflow.dags.git.ssh.keySecretRef }}
+            items:
+              - key: gitSshKey
+                path: ssh
+                mode: 0440

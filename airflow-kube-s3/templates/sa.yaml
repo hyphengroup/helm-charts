@@ -1,0 +1,7 @@
+{{ if .Values.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "airflow-kube-s3.serviceAccountName" . }}
+  labels: {{ include "airflow-kube-s3.labels" . | nindent 4 }}
+{{ end }}

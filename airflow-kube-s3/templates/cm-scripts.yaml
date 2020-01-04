@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "airflow-kube-s3.fullname" . }}-scripts
+  labels: {{ include "airflow-kube-s3.labels" . | nindent 4 }}
+data:
+  init-airflow.sh: |
+    #!/bin/sh -e
+    airflow initdb
+    
+    {{- if .Values.airflow.connections }}
+    echo "adding connections"
+    /usr/local/airflow/scripts/add-connections.sh
+    {{- end }}
+
+    {{- if and .Values.airflow.rbac.enabled .Values.airflow.rbac.users }}
+    echo "adding users"
+    /usr/local/airflow/scripts/add-users.sh
+    {{- end }}

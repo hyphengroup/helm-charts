@@ -1,0 +1,235 @@
+## Airflow settings
+airflow:
+  ## base image for webserver/scheduler/workers
+  image:
+    repository: airflow
+    tag: latest
+    pullPolicy: Always
+
+  ## Additional custom pod Annotations
+  podAnnotations:
+    ## Web / Scheduler use emptyDir volume for Dags synced through git-sync
+    ## Ref: https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md#what-types-of-pods-can-prevent-ca-from-removing-a-node
+    ## Required if persitence is false and they use emptyDir() for dag-data volume (git-sync'ed)
+    "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
+
+  ## Additional labels to add to all manifests
+  labels: {}
+
+  # basic remote logging to s3 using Access Keys
+  # define `s3_logging` connection for use by s3Hook through env var: AIRFLOW_CONN_S3_LOGGING
+  s3_logging:
+    ## Bucket name (without s3:// prefix)
+    bucket_name: my-bucket
+    ## Prefix for all logs (has to start with '/')
+    bucket_key: /airflow/logs
+
+  ## Custom airflow configuration environment variables
+  ## Use this to override any airflow setting settings defining environment variables in the
+  ## following form: AIRFLOW__<section>__<key>.
+  ## See the Airflow documentation: http://airflow.readthedocs.io/en/latest/configuration.html?highlight=__CORE__#setting-configuration-options)
+  ## Example:
+  ##   config:
+  ##     AIRFLOW__CORE__EXPOSE_CONFIG: "True"
+  ##     HTTP_PROXY: "http://proxy.mycompany.com:123"
+  config: {}
+
+  ## If you wish to handle secrets through this chart values (not recommended)
+  ## Secrets will be added as environment variables to all deployments
+  secrets:
+    ## If you disable this, you will manually have to create secrets
+    create: true
+    env:
+      ## You will need to define 
+      ## fernet key
+      ## Generate fernet_key with:
+      ##    python -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)"
+      AIRFLOW__CORE__FERNET_KEY: ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD
+      ## connection string to external Postgres
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://<pg_user>:<pg_password>@<pg_host>:5432/<pg_db>
+      ## s3_Logging connection for S3Hook
+      ## https://airflow.apache.org/docs/stable/howto/connection/index.html#creating-a-connection-with-environment-variables
+      AIRFLOW_CONN_S3_LOGGING: s3://<aws_access_key_id>:<aws_secret_access_key_uri_encoded>@S3
+
+  ## If you wish to handle env config through configmaps / secrets outside of helm chart
+  ## this will be loaded before env config helm values into web, scheduler & KubeWorkers
+  envFrom:
+    configMaps: []
+    secrets:
+      - airflow-secret-env
+
+  ## Configure DAGs deployment through git-sync
+  dags:
+    ## Configure Git repository to fetch DAGs
+    git:
+      url: git@github.com:my-org/my-dag-repo.git
+      branch: master
+      subpath: ""
+      ## Hard coded git fetching through SSH deploy keys:
+      ssh:
+        ## See README on how to create this secret and configmap
+        keySecretRef: airflow-dag-git-key
+        knownHostsConfigMapRef: airflow-dag-git-configmap
+      ## the root directory for git-sync operations, under which --dest will be created
+      root: /git
+      ## folder_mount_point for scheduler / web and workers launched by KubeExecutor
+      ## must be absolute
+      folderMountPoint: /usr/local/airflow/dags
+      ## the name of (a symlink to) a directory in which to check-out files under --root 
+      ## (defaults to the leaf dir of --repo)
+      dest: repo
+      ## Number of seconds to wait between git synchronizations
+      wait: 60
+      ## How often (in seconds) to scan the DAGs directory for new files.
+      dirListInterval: 120
+      ## Configure git-sync image & version
+      image:
+        ## https://github.com/kubernetes/git-sync/releases
+        repository: k8s.gcr.io/git-sync
+        tag: v3.1.3
+        ## Image pull policy
+        ## values: Always, Never or IfNotPresent
+        pullPolicy: IfNotPresent
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "64Mi"
+        requests:
+          cpu: "10m"
+          memory: "32Mi"
+
+  ## Add custom connections
+  ## Use this to add Airflow connections for operators you use
+  ## For each connection - the id and type have to be defined.
+  ## All the other parameters are optional
+  ## Connections will be created with a script that is stored
+  ## in a K8s secret and mounted into the scheduler init container
+  ## Example:
+  ##   connections:
+  ##   - id: my_aws
+  ##     type: aws
+  ##     login: <aws_access_key_id>
+  ##     password: <aws_secret_access_key>
+  ##     extra: '{"region_name":"eu-central-1"}'
+  connections: []
+
+  ## Airflow Scheduler specific config
+  scheduler:
+    ## Pod Annotations for the scheduler deployment
+    podAnnotations: {}
+    ## Configure pod disruption budget for the scheduler
+    podDisruptionBudgetEnabled: true
+    podDisruptionBudget:
+      maxUnavailable: 1
+    resources:
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+      requests:
+        cpu: "500m"
+        memory: "512Mi"
+
+  # Airflow RBAC
+  rbac:
+    # Use FAB-based webserver with RBAC feature, requires setting web.fabConfig
+    enabled: false
+    users: []
+      # ## Initial rbac users can be defined here as a list of maps.
+      # - firstname: "Jon"
+      #   lastname: "Doe"
+      #   email: "jdoe@example.com"
+      #   username: "jdoe"
+      #   role: "Admin"
+      #   password: "JDoe123"
+
+  # Airflow Web specific configuration
+  web:
+    # necessary for links in emails
+    baseUrl: http://localhost
+    replicas: 2
+    ## Pod Annotations for the web deployment
+    podAnnotations: {}
+    port: 8080
+    ## Kube service config
+    service:
+      annotations: {}
+      sessionAffinity: "None"
+      sessionAffinityConfig: {}
+      type: ClusterIP
+    resources:
+      limits:
+        cpu: "300m"
+        memory: "1Gi"
+      requests:
+        cpu: "100m"
+        memory: "512Mi"
+    ## seconds to wait for scheduler init to complete
+    initialStartupDelay: "10"
+    ## seconds to wait before running probes
+    initialDelaySeconds: "30"
+    ## Minimum number of seconds for which a newly created pod should be ready
+    ## without any of its container crashing, for it to be considered available.
+    ## Defaults to 0 (pod will be considered available as soon as it is ready)
+    minReadySeconds: 120
+    readinessProbe:
+      periodSeconds: 60
+      timeoutSeconds: 1
+      successThreshold: 1
+      failureThreshold: 5
+    livenessProbe:
+      periodSeconds: 60
+      timeoutSeconds: 1
+      successThreshold: 1
+      failureThreshold: 5
+    ## Airflow 1.10 RBAC uses flask-appbuilder, manage Auth config here
+    ## Ref: https://flask-appbuilder.readthedocs.io/en/latest/security.html#authentication-methods
+    ## Ref: https://sourcegraph.com/github.com/apache/airflow@1.10.7/-/blob/airflow/config_templates/default_webserver_config.py
+    fabConfig: |
+      import os
+      from airflow import configuration as conf
+      from flask_appbuilder.security.manager import AUTH_DB
+      # from flask_appbuilder.security.manager import AUTH_OAUTH
+      basedir = os.path.abspath(os.path.dirname(__file__))
+      
+      # Flask-WTF flag for CSRF
+      CSRF_ENABLED = True
+
+      # The SQLAlchemy connection string.
+      SQLALCHEMY_DATABASE_URI = conf.get('core', 'SQL_ALCHEMY_CONN')
+      AUTH_TYPE = AUTH_DB
+      # Will allow user self registration
+      AUTH_USER_REGISTRATION = True
+      # The default user self registration role
+      AUTH_USER_REGISTRATION_ROLE = "User"
+
+## Ingress configuration
+ingress:
+  ## enable ingress
+  ## Note: If you want to change url prefix for web ui or flower even if you do not use ingress,
+  ## you can still change ingress.web.path and ingress.flower.path
+  enabled: false
+  ## Configure the webserver endpoint
+  web:
+    ## NOTE: do NOT keep trailing slash. For root configuration, set and empty string
+    path: ""
+    ## hostname for the webserver
+    host: localhost
+    ## Annotations for the webserver
+    ## Airflow webserver handles relative path completely, just let your load balancer give the HTTP
+    ## header like the requested URL (no special configuration neeed)
+    annotations: {}
+    tls:
+      # Hosts is automatically set to ingress.web.host
+      enabled: false
+      secretName: airflow-tls
+
+##  Enable RBAC
+rbac:
+  create: true
+
+## Create or use ServiceAccount
+serviceAccount:
+  create: true
+  # ## The name of the ServiceAccount to use.
+  # ## If not set and create is true, a name is generated using the fullname template
+  name:

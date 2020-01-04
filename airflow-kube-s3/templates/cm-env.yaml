@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ template "airflow-kube-s3.fullname" . }}-env"
+  labels: {{ include "airflow-kube-s3.labels" . | nindent 4 }}
+data:
+  ## Force Singapore timezone
+  TZ: Asia/Singapore
+  {{- range $setting, $option := .Values.airflow.config }}
+  {{ $setting }}: "{{ $option }}"
+  {{- end }}

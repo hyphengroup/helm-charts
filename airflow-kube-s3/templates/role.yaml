@@ -1,0 +1,33 @@
+{{ if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  name: {{ template "airflow-kube-s3.fullname" . }}
+  labels: {{ include "airflow-kube-s3.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""]
+  resources:
+  - pods
+  verbs: ["create", "get", "delete", "list", "watch"]
+- apiGroups: [""]
+  resources:
+  - "pods/log"
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources:
+  - "pods/exec"
+  verbs: ["create", "get"]
+# DAG may read Secrets, so we add this for KubeOperator
+# Note: this is NOT required for KubeScheduler
+# because KubeScheduler without access to secrets can create pod, mounting secrets anyway
+# see: https://github.com/kubernetes/kubernetes/issues/76954
+# if we want to protect airflow secrets, we would need to confine DAG pods to a different namespace
+- apiGroups: [""]
+  resources:
+  - "secrets"
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources:
+  - "configmaps"
+  verbs: ["get", "list"]
+{{ end }}

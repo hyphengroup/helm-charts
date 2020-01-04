@@ -1,0 +1,162 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "airflow-kube-s3.fullname" . }}-web
+  labels: {{ include "airflow-kube-s3.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+spec:
+  replicas: {{ .Values.airflow.web.replicas }}
+  minReadySeconds: {{ .Values.airflow.web.minReadySeconds }}
+  strategy:
+    # Smooth rolling update of the Web UI
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels: {{ include "airflow-kube-s3.matchLabels" . | nindent 6 }}
+      app.kubernetes.io/component: web
+  template:
+    metadata:
+      annotations:
+        checksum/cm-config: {{ include (print $.Template.BasePath "/cm-config.yaml") . | sha256sum }}
+        checksum/cm-env: {{ include (print $.Template.BasePath "/cm-env.yaml") . | sha256sum }}
+        {{- if .Values.airflow.secrets.create }}
+        checksum/secret-env: {{ include (print $.Template.BasePath "/secret-env.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.airflow.rbac.enabled }}
+        checksum/secret-web: {{ include (print $.Template.BasePath "/secret-web.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.airflow.podAnnotations }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
+        {{- with .Values.airflow.web.podAnnotations }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
+      labels: {{ include "airflow-kube-s3.labels" . | nindent 8 }}
+        app.kubernetes.io/component: web
+    spec:
+      securityContext:
+        fsGroup: 1000
+      restartPolicy: Always
+      initContainers:
+        # Wait for airflow-scheduler to complete init
+        - name: wait
+          image: busybox:1.31
+          command: ['sh', '-c', 'sleep {{ .Values.airflow.web.initialStartupDelay }}']
+      containers:
+        - name: git-sync
+          image: {{ .Values.airflow.dags.git.image.repository}}:{{ .Values.airflow.dags.git.image.tag}}
+          imagePullPolicy: {{ .Values.airflow.dags.git.image.pullPolicy | quote }}
+          volumeMounts:
+            - name: airflow-dags
+              mountPath: {{ .Values.airflow.dags.git.root }}
+            - name: git-sync-ssh-configmap
+              mountPath: /etc/git-secret/known_hosts
+              subPath: known_hosts
+            - name: git-sync-ssh-secrets
+              mountPath: /etc/git-secret/ssh
+              subPath: ssh
+          env:
+            - name: GIT_SYNC_REPO
+              value: {{ .Values.airflow.dags.git.url }}
+            - name: GIT_SYNC_BRANCH
+              value: {{ .Values.airflow.dags.git.branch }}
+            - name: GIT_SYNC_ROOT
+              value: {{ .Values.airflow.dags.git.root }}
+            - name: GIT_SYNC_DEST
+              value: {{ .Values.airflow.dags.git.dest }}
+            - name: GIT_SYNC_WAIT
+              value: {{ .Values.airflow.dags.git.wait | quote }}
+              # Mounts for cloning over SSH
+            - name: GIT_SSH_KEY_FILE
+              value: /etc/git-secret/ssh
+            - name: GIT_SYNC_SSH
+              value: "true"
+            - name: GIT_KNOWN_HOSTS
+              value: "true"
+            - name: GIT_SSH_KNOWN_HOSTS_FILE
+              value: /etc/git-secret/known_hosts
+          resources:
+            {{- toYaml .Values.airflow.dags.git.resources | trim | nindent 12 }}
+        - name: webserver
+          image: {{ .Values.airflow.image.repository }}:{{ .Values.airflow.image.tag }}
+          imagePullPolicy: {{ .Values.airflow.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.airflow.web.port }}
+          args: ["webserver"]
+          envFrom:
+            {{- range .Values.airflow.envFrom.configMaps }}
+            - configMapRef:
+                name: {{ . }}
+            {{- end }}
+            {{- range .Values.airflow.envFrom.secrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            - configMapRef:
+                name: {{ template "airflow-kube-s3.fullname" . }}-env
+            {{- if .Values.airflow.secrets.create }}
+            - secretRef:
+                name: {{ template "airflow-kube-s3.fullname" . }}-env
+            {{- end }}
+          env:
+            - name: AIRFLOW__KUBERNETES__NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {{- toYaml .Values.airflow.web.resources | trim | nindent 12 }}
+          volumeMounts:
+            - name: airflow-config
+              mountPath: /usr/local/airflow/airflow.cfg
+              subPath: airflow.cfg
+            {{- if .Values.airflow.rbac.enabled }}
+            - name: webserver-config
+              mountPath: /usr/local/airflow/webserver_config.py
+              subPath: webserver_config.py
+            {{- end }}
+            - name: airflow-dags
+              mountPath: {{ .Values.airflow.dags.git.folderMountPoint }}
+          livenessProbe:
+            httpGet:
+              path: "/health"
+              port: http
+            ## Keep 6 minutes the delay to allow clean wait of postgres and redis containers
+            initialDelaySeconds: {{ .Values.airflow.web.initialDelaySeconds }}
+            periodSeconds: {{ .Values.airflow.web.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.airflow.web.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.airflow.web.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.airflow.web.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: "/health"
+              port: http
+            initialDelaySeconds: {{ .Values.airflow.web.initialDelaySeconds }}
+            periodSeconds: {{ .Values.airflow.web.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.airflow.web.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.airflow.web.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.airflow.web.readinessProbe.failureThreshold }}
+      volumes:
+        - name: airflow-dags
+          emptyDir: {}
+        - name: airflow-config
+          configMap:
+            name: {{ template "airflow-kube-s3.fullname" . }}-config
+        {{- if .Values.airflow.rbac.enabled }}
+        - name: webserver-config
+          secret:
+            secretName: {{ template "airflow-kube-s3.fullname" . }}-web
+        {{- end }}
+        - name: git-sync-ssh-configmap
+          configMap:
+            name: {{ .Values.airflow.dags.git.ssh.knownHostsConfigMapRef }}
+            defaultMode: 0440
+        - name: git-sync-ssh-secrets
+          secret:
+            secretName: {{ .Values.airflow.dags.git.ssh.keySecretRef }}
+            items:
+              - key: gitSshKey
+                path: ssh
+                mode: 0440

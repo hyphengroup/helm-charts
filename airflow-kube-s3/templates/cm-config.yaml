@@ -1,0 +1,361 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "airflow-kube-s3.fullname" . }}-config
+  labels: {{ include "airflow-kube-s3.labels" . | nindent 4 }}
+data:
+  airflow.cfg: |
+    [core]
+    # The folder where your airflow pipelines live, most likely a
+    # subfolder in a code repository
+    # This path must be absolute
+    dags_folder = {{ compact (list .Values.airflow.dags.git.folderMountPoint .Values.airflow.dags.git.dest .Values.airflow.dags.git.subpath ) | join "/"}}
+
+    # The folder where airflow should store its log files
+    # This path must be absolute
+    base_log_folder = /usr/local/airflow/logs
+
+    # Airflow can store logs remotely in AWS S3, Google Cloud Storage or Elastic Search.
+    # Users must supply an Airflow connection id that provides access to the storage
+    # location. If remote_logging is set to true, see UPDATING.md for additional
+    # configuration requirements.
+    remote_logging = True
+    remote_log_conn_id = s3_logging
+    remote_base_log_folder = s3://{{ .Values.airflow.s3_logging.bucket_name }}{{ .Values.airflow.s3_logging.bucket_key }}
+    encrypt_s3_logs = False
+
+    # Logging level
+    logging_level = INFO
+    fab_logging_level = WARN
+
+    dag_processor_manager_log_location = /usr/local/airflow/logs/dag_processor_manager/dag_processor_manager.log
+
+    # Default timezone in case supplied date times are naive
+    # can be utc (default), system, or any IANA timezone string (e.g. Europe/Amsterdam)
+    default_timezone = Asia/Singapore
+
+    # The executor class that airflow should use. Choices include
+    # SequentialExecutor, LocalExecutor, CeleryExecutor, DaskExecutor, KubernetesExecutor
+    executor = KubernetesExecutor
+
+    # The amount of parallelism as a setting to the executor. This defines
+    # the max number of task instances that should run simultaneously
+    # on this airflow installation
+    parallelism = 32
+
+    # The number of task instances allowed to run concurrently by the scheduler
+    dag_concurrency = 16
+
+    # Are DAGs paused by default at creation
+    dags_are_paused_at_creation = True
+
+    # The maximum number of active DAG runs per DAG
+    max_active_runs_per_dag = 16
+
+    # Whether to load the examples that ship with Airflow. It's good to
+    # get started, but you probably want to set this to False in a production
+    # environment
+    load_examples = False
+
+    # Where your Airflow plugins are stored
+    plugins_folder = /usr/local/airflow/plugins
+
+    # Secret key to save connection passwords in the db
+    fernet_key = $FERNET_KEY
+
+    # Whether to disable pickling dags
+    donot_pickle = False
+
+    # How long before timing out a python file import while filling the DagBag
+    dagbag_import_timeout = 30
+
+    # How long before timing out a DagFileProcessor, which processes a dag file
+    dag_file_processor_timeout = 50
+
+    # Whether to enable pickling for xcom (note that this is insecure and allows for
+    # RCE exploits). This will be deprecated in Airflow 2.0 (be forced to False).
+    enable_xcom_pickling = False
+
+    # When a task is killed forcefully, this is the amount of time in seconds that
+    # it has to cleanup after it is sent a SIGTERM, before it is SIGKILLED
+    killed_task_cleanup_time = 60
+
+    # Whether to override params with dag_run.conf. If you pass some key-value pairs through `airflow backfill -c` or
+    # `airflow trigger_dag -c`, the key-value pairs will override the existing ones in params.
+    dag_run_conf_overrides_params = False
+
+    # Worker initialisation check to validate Metadata Database connection
+    worker_precheck = False
+
+    # When discovering DAGs, ignore any files that don't contain the strings `DAG` and `airflow`.
+    dag_discovery_safe_mode = True
+
+    # The number of retries each task is going to have by default. Can be overridden at dag or task level.
+    default_task_retries = 0
+
+    [api]
+    # How to authenticate users of the API
+    auth_backend = airflow.api.auth.backend.default
+
+    [operators]
+    # The default owner assigned to each new operator, unless
+    # provided explicitly or passed via `default_args`
+    default_owner = airflow
+    default_cpus = 1
+    default_ram = 512
+    default_disk = 512
+    default_gpus = 0
+
+    [webserver]
+    # The base url of your website as airflow cannot guess what domain or
+    # cname you are using. This is used in automated emails that
+    # airflow sends to point links to the right web server
+    base_url = {{ .Values.airflow.web.baseUrl }}
+
+    # The ip specified when starting the web server
+    web_server_host = 0.0.0.0
+
+    # The port on which to run the web server
+    web_server_port = {{ .Values.airflow.web.port }}
+
+    # Number of seconds the webserver waits before killing gunicorn master that doesn't respond
+    web_server_master_timeout = 120
+
+    # Number of seconds the gunicorn webserver waits before timing out on a worker
+    web_server_worker_timeout = 120
+
+    # Number of workers to refresh at a time. When set to 0, worker refresh is
+    # disabled. When nonzero, airflow periodically refreshes webserver workers by
+    # bringing up new ones and killing old ones.
+    worker_refresh_batch_size = 1
+
+    # Number of seconds to wait before refreshing a batch of workers.
+    worker_refresh_interval = 30
+
+    # Secret key used to run your flask app
+    secret_key = temporary_key
+
+    # Number of workers to run the Gunicorn web server
+    workers = 4
+
+    # The worker class gunicorn should use. Choices include
+    # sync (default), eventlet, gevent
+    worker_class = sync
+
+    # Log files for the gunicorn webserver. '-' means log to stderr.
+    access_logfile = -
+    error_logfile = -
+
+    # Expose the configuration file in the web server
+    # This is only applicable for the flask-admin based web UI (non FAB-based).
+    # In the FAB-based web UI with RBAC feature,
+    # access to configuration is controlled by role permissions.
+    expose_config = True
+
+    # Default DAG view.  Valid values are:
+    # tree, graph, duration, gantt, landing_times
+    dag_default_view = tree
+
+    # Default DAG orientation. Valid values are:
+    # LR (Left->Right), TB (Top->Bottom), RL (Right->Left), BT (Bottom->Top)
+    dag_orientation = LR
+
+    # The amount of time (in secs) webserver will wait for initial handshake
+    # while fetching logs from other worker machine
+    log_fetch_timeout_sec = 5
+
+    # By default, the webserver shows paused DAGs. Flip this to hide paused
+    # DAGs by default
+    hide_paused_dags_by_default = False
+
+    # Consistent page size across all listing views in the UI
+    page_size = 100
+
+    # Use FAB-based webserver with RBAC feature
+    rbac = {{ .Values.airflow.rbac.enabled }}
+
+    # Define the color of navigation bar
+    navbar_color = #007A87
+
+    # Default dagrun to show in UI
+    default_dag_run_display_number = 25
+
+    # Default setting for wrap toggle on DAG code and TI log views.
+    default_wrap = False
+
+    # Update FAB permissions and sync security manager roles
+    # on webserver startup
+    update_fab_perms = True
+
+    [email]
+    email_backend = airflow.utils.email.send_email_smtp
+
+    [smtp]
+    # If you want airflow to send emails on retries, failure, and you want to use
+    # the airflow.utils.email.send_email_smtp function, you have to configure an
+    # smtp server here
+    smtp_host = localhost
+    smtp_starttls = True
+    smtp_ssl = False
+    # Uncomment and set the user/pass settings if you want to use SMTP AUTH
+    # smtp_user = airflow
+    # smtp_password = airflow
+    smtp_port = 25
+    smtp_mail_from = airflow@example.com
+
+    [scheduler]
+    child_process_log_directory = /usr/local/airflow/logs/scheduler
+
+    # How often (in seconds) to scan the DAGs directory for new files. Default was 5 minutes.
+    dag_dir_list_interval = {{ .Values.airflow.dags.git.dirListInterval }}
+
+    [admin]
+    # UI to hide sensitive variable fields when set to True
+    hide_sensitive_variable_fields = True
+
+    [kubernetes]
+    # The name of the Kubernetes ConfigMap Containing the Airflow Configuration (this file)
+    airflow_configmap = {{ template "airflow-kube-s3.fullname" . }}-config
+    worker_container_repository = {{ .Values.airflow.image.repository }}
+    worker_container_tag = {{ .Values.airflow.image.tag }}
+    worker_container_image_pull_policy = {{ .Values.airflow.image.pullPolicy }}
+    delete_worker_pods = True
+
+    # For docker image already contains DAGs, this is set to `True`, and the worker will search for dags in dags_folder,
+    # otherwise use git sync or dags volume claim to mount DAGs
+    dags_in_image = False
+    
+    git_sync_root = {{ .Values.airflow.dags.git.root }}
+    git_sync_dest = {{ .Values.airflow.dags.git.dest }}
+
+    git_repo = {{ .Values.airflow.dags.git.url }}
+    git_branch = {{ .Values.airflow.dags.git.branch }}
+    git_subpath = {{ .Values.airflow.dags.git.subpath }}
+    # The specific rev or hash the git_sync init container will checkout
+    # This becomes GIT_SYNC_REV environment variable in the git_sync init container for worker pods
+    git_sync_rev =
+
+    # Mount point of the volume of git-sync into workers, web and scheduler
+    git_dags_folder_mount_point = {{ .Values.airflow.dags.git.folderMountPoint }}
+
+    # for cloning dags from git repositories into volumes: https://github.com/kubernetes/git-sync
+    git_sync_container_repository = {{ .Values.airflow.dags.git.image.repository}}
+    git_sync_container_tag = {{ .Values.airflow.dags.git.image.tag}}
+    git_sync_init_container_name = git-sync-clone
+    git_sync_run_as_user = 65533
+
+    # Number of Kubernetes Worker Pod creation calls per scheduler loop
+    worker_pods_creation_batch_size = 1
+
+    {{- $ref := printf "%s-env" (include "airflow-kube-s3.fullname" . )}}
+    
+    # A list of configMapsRefs to envFrom. If more than one configMap is
+    # specified, provide a comma separated list: configmap_a,configmap_b
+    env_from_configmap_ref = {{ concat (list $ref) .Values.airflow.envFrom.configMaps | join "," }}
+
+    # A list of secretRefs to envFrom. If more than one secret is
+    # specified, provide a comma separated list: secret_a,secret_b
+    {{- if .Values.airflow.secrets.create }}
+    env_from_secret_ref = {{ concat (list $ref) .Values.airflow.envFrom.secrets | join "," }}
+    {{- else }}
+    env_from_secret_ref = {{ .Values.airflow.envFrom.secrets | join "," }}
+    {{- end }}
+    
+    # Use git_ssh_key_secret_name and git_ssh_known_hosts_configmap_name
+    # for SSH authentication
+    git_ssh_key_secret_name = {{ .Values.airflow.dags.git.ssh.keySecretRef }}
+    git_ssh_known_hosts_configmap_name = {{ .Values.airflow.dags.git.ssh.knownHostsConfigMapRef }}
+
+    # The name of the Kubernetes service account to be associated with airflow workers, if any.
+    # Service accounts are required for workers that require access to secrets or cluster resources.
+    # See the Kubernetes RBAC documentation for more:
+    #   https://kubernetes.io/docs/admin/authorization/rbac/
+    worker_service_account_name = {{ template "airflow-kube-s3.serviceAccountName" . }}
+
+    # Any image pull secrets to be given to worker pods, If more than one secret is
+    # required, provide a comma separated list: secret_a,secret_b
+    image_pull_secrets =
+
+    # Use the service account kubernetes gives to pods to connect to kubernetes cluster.
+    # It's intended for clients that expect to be running inside a pod running on kubernetes.
+    # It will raise an exception if called from a process not running in a kubernetes environment.
+    in_cluster = True
+
+    # When running with in_cluster=False change the default cluster_context or config_file
+    # options to Kubernetes client. Leave blank these to use default behaviour like `kubectl` has.
+    # cluster_context =
+    # config_file =
+
+    # Affinity configuration as a single line formatted JSON object.
+    # See the affinity model for top-level key names (e.g. `nodeAffinity`, etc.):
+    #   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#affinity-v1-core
+    affinity =
+
+    # A list of toleration objects as a single line formatted JSON array
+    # See:
+    #   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#toleration-v1-core
+    tolerations =
+
+    # **kwargs parameters to pass while calling a kubernetes client core_v1_api methods from Kubernetes Executor
+    # provided as a single line formatted JSON dictionary string.
+    # List of supported params in **kwargs are similar for all core_v1_apis, hence a single config variable for all apis
+    # See:
+    #   https://raw.githubusercontent.com/kubernetes-client/python/master/kubernetes/client/apis/core_v1_api.py
+    # Note that if no _request_timeout is specified, the kubernetes client will wait indefinitely for kubernetes
+    # api responses, which will cause the scheduler to hang. The timeout is specified as [connect timeout, read timeout]
+    kube_client_request_args = {"_request_timeout" : [60,60] }
+
+    # Worker pods security context options
+    # See:
+    #   https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+
+    # Specifies the uid to run the first process of the worker pods containers as
+    run_as_user =
+
+    # Specifies a gid to associate with all containers in the worker pods
+    # if using a git_ssh_key_secret_name use an fs_group
+    # that allows for the key to be read, e.g. 65533
+    fs_group = 65533
+
+    [kubernetes_node_selectors]
+    # The Key-value pairs to be given to worker pods.
+    # The worker pods will be scheduled to the nodes of the specified key-value pairs.
+    # Should be supplied in the format: key = value
+
+    [kubernetes_annotations]
+    # The Key-value annotations pairs to be given to worker pods.
+    # Should be supplied in the format: key = value
+
+    [kubernetes_environment_variables]
+    # The scheduler sets the following environment variables into your workers. You may define as
+    # many environment variables as needed and the kubernetes launcher will set them in the launched workers.
+    # Environment variables in this section are defined as follows
+    #     <environment_variable_key> = <environment_variable_value>
+    #
+    # For example if you wanted to set an environment variable with value `prod` and key
+    # `ENVIRONMENT` you would follow the following format:
+    #     ENVIRONMENT = prod
+    #
+    # Additionally you may override worker airflow settings with the AIRFLOW__<SECTION>__<KEY>
+    # formatting as supported by airflow normally.
+
+    [kubernetes_secrets]
+    # The scheduler mounts the following secrets into your workers as they are launched by the
+    # scheduler. You may define as many secrets as needed and the kubernetes launcher will parse the
+    # defined secrets and mount them as secret environment variables in the launched workers.
+    # Secrets in this section are defined as follows
+    #     <environment_variable_mount> = <kubernetes_secret_object>=<kubernetes_secret_key>
+    #
+    # For example if you wanted to mount a kubernetes secret key named `postgres_password` from the
+    # kubernetes secret object `airflow-secret` as the environment variable `POSTGRES_PASSWORD` into
+    # your workers you would follow the following format:
+    #     POSTGRES_PASSWORD = airflow-secret=postgres_credentials
+    #
+    # Additionally you may override worker airflow settings with the AIRFLOW__<SECTION>__<KEY>
+    # formatting as supported by airflow normally.
+
+    [kubernetes_labels]
+    # The Key-value pairs to be given to worker pods.
+    # The worker pods will be given these static labels, as well as some additional dynamic labels
+    # to identify the task.
+    # Should be supplied in the format: key = value
