@@ -24,7 +24,7 @@ push/%: gh-pages ## Package & Push chart
 	cd gh-pages && \
 		git add . && \
 		git commit -am"Publishing $*-$$(grep version ../$*/Chart.yaml | sed 's/^.*: //g')" && \
-		git push gh-pages
+		git push origin
 
 clean: ## Deletes all first level folders called test (use with care)
 	rm -rf */test
