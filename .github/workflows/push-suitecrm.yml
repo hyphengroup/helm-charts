@@ -1,11 +1,11 @@
-name: Publish to ECR
+name: Publish SuiteCRM to ECR
 
 on:
   push:
     branches:
     - master
     paths:
-    - .images/suitecrm
+    - '.images/suitecrm/**'
 
 jobs:
   push:

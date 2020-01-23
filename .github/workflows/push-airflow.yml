@@ -1,11 +1,11 @@
-name: Publish to ECR
+name: Publish Airflow to ECR
 
 on:
   push:
     branches:
     - master
     paths:
-    - .images/airflow
+    - '.images/airflow/**'
 
 jobs:
   push:
