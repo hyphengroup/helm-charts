@@ -1,0 +1,62 @@
+version: '3.7'
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  redis:
+    image: bitnami/redis:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - app-tier
+  mariadb:
+    image: bitnami/mariadb:10.2
+    env_file: suitecrm-example.env
+    # environment:
+    #   - MARIADB_USER=bn_suitecrm
+    #   - MARIADB_DATABASE=bitnami_suitecrm
+    #   - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - app-tier
+    volumes:
+      - 'mariadb_data:/bitnami'
+    # ports:
+    #   - 127.0.0.1:3306:3306
+  suitecrm:
+    build:
+      context: ../.images/suitecrm
+      args:
+        SUITECRM_VERSION: 7.11.10
+    # image: '${SUITECRM_IMAGE}'
+    env_file: suitecrm-example.env
+    volumes:
+      - type: bind
+        source: ./suitecrm-entrypoint.sh
+        target: /entrypoint.sh
+    entrypoint: /entrypoint.sh
+    command:
+      - apache2-foreground
+    # environment:
+    #   - MARIADB_HOST=mariadb
+    #   - MARIADB_PORT_NUMBER=3306
+    #   - SUITECRM_DATABASE_USER=bn_suitecrm
+    #   - SUITECRM_DATABASE_NAME=bitnami_suitecrm
+    #   - ALLOW_EMPTY_PASSWORD=yes
+    #   - CRM_BASE_URL=http://host.docker.internal:6462/notify
+    networks:
+      - app-tier
+    ports:
+      - '80:80'
+      - '443:443'
+    # volumes:
+    #   - 'suitecrm_data:/var/www/html'
+    depends_on:
+      - mariadb
+      - redis
+volumes:
+  mariadb_data:
+    driver: local
+  # suitecrm_data:
+  #   driver: local

@@ -1,0 +1,24 @@
+name: Publish to ECR
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - .images/suitecrm
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    
+    - name: Build image
+      run: make build
+      working-directory: .images/suitecrm
+
+    - name: Push image to ECR
+      run: make push
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}

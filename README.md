@@ -9,7 +9,7 @@ For OpenSource projects - when we don't have time to push into helm/charts
 Basic testing (requires Helm and a configured kubectl with working context):
 
 ```
-make test/<chart>
+make test/charts/<name>
 make clean
 ```
 
@@ -20,7 +20,7 @@ Charts are published to gh-pages branch:
 Pushing charts:
 
 ```
-make push/<chart>
+make push/charts/<name>
 ```
 
 ## Using Charts

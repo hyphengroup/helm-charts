@@ -9,11 +9,20 @@ build/airflow/%: ## Build custom image for airflow
 	docker build --rm \
 		--build-arg AIRFLOW_VERSION="$*" \
 		--build-arg AIRFLOW_DEPS="datadog,kubernetes,s3" \
-		-t $(ECR_URL)thirdparty/airflow:$* airflow
+		-t $(ECR_URL)/thirdparty/airflow:$* airflow
 
 push/airflow/%: docker/login ## Push custom image for airflow
-	docker push $(ECR_URL)thirdparty/airflow:$*
+	docker push $(ECR_URL)/thirdparty/airflow:$*
+
+# https://suitecrm.com/download/
+build/suitecrm/%: ## Build custom image for suitecrm
+	docker build --rm \
+		--build-arg SUITECRM_VERSION="$*" \
+		-t $(ECR_URL)/thirdparty/suitecrm:$* suitecrm
+
+push/suitecrm/%: docker/login ## Push custom image for suitecrm
+	docker push $(ECR_URL)/thirdparty/suitecrm:$*
 
 docker/login:
 	awssso --region ${SSO_REGION} login -p ${AWS_PROFILE} -a ${AWS_PROFILE}
-	$$(aws ecr get-login --no-include-email --region $(REGION))
+	$$(aws ecr get-login --no-include-email --region $(ECR_REGION))
