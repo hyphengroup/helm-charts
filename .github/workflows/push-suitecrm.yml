@@ -16,6 +16,7 @@ jobs:
     - name: Build image
       run: make build
       working-directory: .images/suitecrm
+      env:
         ECR_REGISTRY_URL: ${{ secrets.ECR_REGISTRY_URL }}
 
     - name: Push image to ECR
