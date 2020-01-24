@@ -6,6 +6,7 @@ on:
     - master
     paths:
     - '.images/suitecrm/**'
+    - '.github/workflows/push-suitecrm.yml'
 
 jobs:
   push:
