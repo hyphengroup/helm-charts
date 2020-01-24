@@ -16,9 +16,13 @@ jobs:
     - name: Build image
       run: make build
       working-directory: .images/suitecrm
+        ECR_REGISTRY_URL: ${{ secrets.ECR_REGISTRY_URL }}
 
     - name: Push image to ECR
       run: make push
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
+        ECR_REGISTRY_URL: ${{ secrets.ECR_REGISTRY_URL }}
+        ECR_REGION: ${{ secrets.ECR_REGION }}
+
