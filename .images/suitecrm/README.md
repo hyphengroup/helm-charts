@@ -6,7 +6,7 @@ Dockerfile for SuiteCRM 7.11.10 on php 7.3 / debian buster
 - Uses sourceforge release archive to set up SuiteCRM without having to run `composer install --no-dev`
 - Runs SuiteCRM silent install as part of entrypoint (could define `/bootstrap/` as a volume to control this?)
 - Runs cron process in background without supervisord (there's a risk cron stops running?)
-- Includes procps / mysql-client for basic utilities (dump db / restore db)
+- Includes procps / mysql-client / envsubst for basic utilities (dump db / restore db)
 
 Notes:
 
