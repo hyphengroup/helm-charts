@@ -14,6 +14,10 @@ build/airflow/%: ## Build custom image for airflow
 push/airflow/%: docker/login ## Push custom image for airflow
 	docker push $(ECR_URL)/thirdparty/airflow:$*
 
+build/socat: ## Build custom image for socat
+	docker build --rm \
+		-t $(ECR_URL)/thirdparty/socat:latest socat
+
 # https://suitecrm.com/download/
 build/suitecrm/%: ## Build custom image for suitecrm
 	docker build --rm \
