@@ -1,0 +1,30 @@
+name: Publish ArgoCD to ECR
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - '.images/argocd-helmfile/**'
+    - '.github/workflows/push-argocd-helmfile.yml'
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    
+    - name: Build image
+      run: make build
+      working-directory: .images/argocd-helmfile
+      env:
+        ECR_REGISTRY_URL: ${{ secrets.ECR_REGISTRY_URL }}
+
+    - name: Push image to ECR
+      run: make push
+      working-directory: .images/argocd-helmfile
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
+        ECR_REGISTRY_URL: ${{ secrets.ECR_REGISTRY_URL }}
+        ECR_REGION: ${{ secrets.ECR_REGION }}
