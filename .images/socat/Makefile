@@ -1,7 +1,6 @@
 .PHONY: build docker/login push
 
 ECR_REPO:=thirdparty/socat
-# https://suitecrm.com/download/
 VERSION:=1.0.0
 TAG:=$(ECR_REGISTRY_URL)/$(ECR_REPO):$(VERSION)
 
