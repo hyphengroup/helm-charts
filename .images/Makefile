@@ -18,6 +18,16 @@ build/socat: ## Build custom image for socat
 	docker build --rm \
 		-t $(ECR_URL)/thirdparty/socat:latest socat
 
+build/argocd/%: ## Build custom image for argocd with helmfile
+	docker build --rm \
+		--build-arg ARGO_VERSION="$*" \
+		--build-arg SOPS_VERSION="3.5.0" \
+		--build-arg HELMFILE_VERSION="0.98.1" \
+		-t $(ECR_URL)/thirdparty/argocd-helmfile:$*  argocd-helmfile
+
+push/argocd/%: docker/login ## Push custom image for argocd with helmfile
+	docker push $(ECR_URL)/thirdparty/argocd-helmfile:$*
+
 # https://suitecrm.com/download/
 build/suitecrm/%: ## Build custom image for suitecrm
 	docker build --rm \
