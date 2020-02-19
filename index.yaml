@@ -3,7 +3,7 @@ entries:
   airflow-kube-s3:
   - apiVersion: v1
     appVersion: 1.10.7
-    created: "2020-02-19T14:39:49.184935+08:00"
+    created: "2020-02-19T14:42:53.671757+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 87bd47f39d58e3f2a33599a6d73e1df13913b79d5297655c496c0906acc6a0f5
     home: https://usr/local/airflow.apache.org/
@@ -20,10 +20,31 @@ entries:
     urls:
     - https://compareasiagroup.github.io/helm-charts/airflow-kube-s3-0.0.1.tgz
     version: 0.0.1
+  kube-node-lifecycle-labeller:
+  - apiVersion: v1
+    appVersion: 1.15.3-1
+    created: "2020-02-19T14:42:53.672182+08:00"
+    description: The lifecycle labeller fetches the LifeCycle attribute of a node
+      and conditionally adds labels and taints based on EC2 lifecycle.
+    digest: d83f10a04a249760b34ad27610120f1dbcaadcd8d1fc312b95c47562497ff8d6
+    home: https://github.com/compareasiagroup/kube-node-lifecycle-labeller
+    keywords:
+    - spot
+    - labels
+    - taints
+    maintainers:
+    - email: vincent.drl@gmail.com
+      name: so0k
+    name: kube-node-lifecycle-labeller
+    sources:
+    - https://github.com/compareasiagroup/kube-node-lifecycle-labeller
+    urls:
+    - https://compareasiagroup.github.io/helm-charts/kube-node-lifecycle-labeller-0.1.0.tgz
+    version: 0.1.0
   private-charts-repo:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2020-02-19T14:39:49.185188+08:00"
+    created: "2020-02-19T14:42:53.672398+08:00"
     description: Nodejs http server clones a private GitHub or BitBucket repo and
       serves the files.
     digest: 4481997b5e65798b69b21e4bc5af228f3cfaed7c21685438de653abf752a9c77
@@ -34,7 +55,7 @@ entries:
   sops-secrets-operator:
   - apiVersion: v1
     appVersion: 0.0.9
-    created: "2020-02-19T14:39:49.185533+08:00"
+    created: "2020-02-19T14:42:53.672775+08:00"
     description: sops secrets operator
     digest: f46e2f0f9924663393feea5d56670c63165ec6e953f4a891892630de267702ea
     maintainers:
@@ -46,4 +67,4 @@ entries:
     urls:
     - https://compareasiagroup.github.io/helm-charts/sops-secrets-operator-0.1.8.tgz
     version: 0.1.8
-generated: "2020-02-19T14:39:49.184164+08:00"
+generated: "2020-02-19T14:42:53.67051+08:00"
