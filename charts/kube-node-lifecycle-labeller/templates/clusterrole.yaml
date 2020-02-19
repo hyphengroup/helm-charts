@@ -1,0 +1,21 @@
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "kube-node-lifecycle-labeller.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ template "kube-node-lifecycle-labeller.name" . }}
+    helm.sh/chart: {{ template "kube-node-lifecycle-labeller.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+rules:
+  # For patching labels / taints unto nodes
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - patch
+{{- end}}

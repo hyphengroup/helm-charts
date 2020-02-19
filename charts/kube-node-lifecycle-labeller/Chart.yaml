@@ -1,0 +1,16 @@
+apiVersion: v1
+appVersion: 1.15.3-1
+description: The lifecycle labeller fetches the LifeCycle attribute of a node and
+  conditionally adds labels and taints based on EC2 lifecycle.
+home: https://github.com/compareasiagroup/kube-node-lifecycle-labeller
+keywords:
+- spot
+- labels
+- taints
+maintainers:
+- email: vincent.drl@gmail.com
+  name: so0k
+name: kube-node-lifecycle-labeller
+sources:
+- https://github.com/compareasiagroup/kube-node-lifecycle-labeller
+version: 0.1.0

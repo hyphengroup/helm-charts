@@ -1,0 +1,3 @@
+To verify that kube-node-lifecycle-labeller has started, run:
+
+  kubectl --namespace={{ .Release.Namespace }} get pods -l "app.kubernetes.io/name={{ include "kube-node-lifecycle-labeller.name" . }},app.kubernetes.io/instance={{ .Release.Name }}"
