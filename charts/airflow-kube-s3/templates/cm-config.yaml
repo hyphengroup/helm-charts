@@ -264,7 +264,10 @@ data:
     # Use git_ssh_key_secret_name and git_ssh_known_hosts_configmap_name
     # for SSH authentication
     git_ssh_key_secret_name = {{ .Values.airflow.dags.git.ssh.keySecretRef }}
+    {{- if .Values.airflow.dags.git.ssh.strictHostKeyChecking }}
+    # ref: https://sourcegraph.com/github.com/apache/airflow@1.10.7/-/blob/airflow/contrib/kubernetes/worker_configuration.py#L129:29
     git_ssh_known_hosts_configmap_name = {{ .Values.airflow.dags.git.ssh.knownHostsConfigMapRef }}
+    {{- end }}
 
     # The name of the Kubernetes service account to be associated with airflow workers, if any.
     # Service accounts are required for workers that require access to secrets or cluster resources.

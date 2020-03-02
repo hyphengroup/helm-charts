@@ -70,6 +70,7 @@ airflow:
         ## See README on how to create this secret and configmap
         keySecretRef: airflow-dag-git-key
         knownHostsConfigMapRef: airflow-dag-git-configmap
+        strictHostKeyChecking: true
       ## the root directory for git-sync operations, under which --dest will be created
       root: /git
       ## folder_mount_point for scheduler / web and workers launched by KubeExecutor

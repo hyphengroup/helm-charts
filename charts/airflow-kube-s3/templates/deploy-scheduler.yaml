@@ -121,7 +121,7 @@ spec:
             - name: GIT_SYNC_SSH
               value: "true"
             - name: GIT_KNOWN_HOSTS
-              value: "true"
+              value:  {{ .Values.airflow.dags.git.ssh.strictHostKeyChecking | quote }}
             - name: GIT_SSH_KNOWN_HOSTS_FILE
               value: /etc/git-secret/known_hosts
           resources:
