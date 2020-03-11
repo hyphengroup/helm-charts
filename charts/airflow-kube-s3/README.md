@@ -41,7 +41,7 @@ kubectl create secret --namespace default generic airflow-dag-git-key --type=opa
     --from-file=gitSshKey=$HOME/.ssh/id_airflow
 ```
 
-NOTE: 1.10.7 has the secret key hardcoded to `gitSshKey`!
+NOTE: 1.10.9 has the secret key hardcoded to `gitSshKey`!
 
 TODO:
 
