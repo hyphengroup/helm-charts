@@ -1,0 +1,5 @@
+{{- define "container.statsd" }}
+- name: statsd
+  image: {{ .image }}
+  imagePullPolicy: {{ .imagePullPolicy }}
+{{- end }}

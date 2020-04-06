@@ -163,6 +163,10 @@ spec:
               mountPath: /usr/local/airflow/webserver_config.py
               subPath: webserver_config.py
             {{- end }}
+
+        {{- if .Values.statsd.enabled }}
+        {{- include "container.statsd" .Values.statsd | indent 8 }}
+        {{- end }}
       volumes:
         - name: airflow-dags
           emptyDir: {}
