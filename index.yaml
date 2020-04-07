@@ -2,8 +2,27 @@ apiVersion: v1
 entries:
   airflow-kube-s3:
   - apiVersion: v1
+    appVersion: 1.10.9
+    created: "2020-04-07T16:15:09.890296+08:00"
+    description: Airflow running with KubernetesExecutor, git-sync and logs to s3
+    digest: 3b90b060b91ed5da481ec13bac570211d9faa42317bb1fbb377befbef1390091
+    home: https://usr/local/airflow.apache.org/
+    icon: https://usr/local/airflow.apache.org/_images/pin_large.png
+    keywords:
+    - workflow
+    - airflow
+    - dag
+    - aws
+    - git-sync
+    name: airflow-kube-s3
+    sources:
+    - https://usr/local/airflow.apache.org/
+    urls:
+    - https://compareasiagroup.github.io/helm-charts/airflow-kube-s3-0.0.3-alpha+001.tgz
+    version: 0.0.3-alpha+001
+  - apiVersion: v1
     appVersion: 1.10.7
-    created: "2020-03-02T15:23:13.189583+08:00"
+    created: "2020-04-07T16:15:09.889362+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: a3a31de284bd0fc17e2fa7225aa773a11857d7f9ee3c5e0be01328251bcbf052
     home: https://usr/local/airflow.apache.org/
@@ -22,7 +41,7 @@ entries:
     version: 0.0.2
   - apiVersion: v1
     appVersion: 1.10.7
-    created: "2020-03-02T15:23:13.188872+08:00"
+    created: "2020-04-07T16:15:09.888729+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 87bd47f39d58e3f2a33599a6d73e1df13913b79d5297655c496c0906acc6a0f5
     home: https://usr/local/airflow.apache.org/
@@ -42,7 +61,7 @@ entries:
   kube-node-lifecycle-labeller:
   - apiVersion: v1
     appVersion: 1.15.3-1
-    created: "2020-03-02T15:23:13.19066+08:00"
+    created: "2020-04-07T16:15:09.890626+08:00"
     description: The lifecycle labeller fetches the LifeCycle attribute of a node
       and conditionally adds labels and taints based on EC2 lifecycle.
     digest: d83f10a04a249760b34ad27610120f1dbcaadcd8d1fc312b95c47562497ff8d6
@@ -63,7 +82,7 @@ entries:
   private-charts-repo:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2020-03-02T15:23:13.191796+08:00"
+    created: "2020-04-07T16:15:09.891823+08:00"
     description: Nodejs http server clones a private GitHub or BitBucket repo and
       serves the files.
     digest: 4481997b5e65798b69b21e4bc5af228f3cfaed7c21685438de653abf752a9c77
@@ -74,7 +93,7 @@ entries:
   sops-secrets-operator:
   - apiVersion: v1
     appVersion: 0.0.9
-    created: "2020-03-02T15:23:13.194448+08:00"
+    created: "2020-04-07T16:15:09.892276+08:00"
     description: sops secrets operator
     digest: f46e2f0f9924663393feea5d56670c63165ec6e953f4a891892630de267702ea
     maintainers:
@@ -86,4 +105,4 @@ entries:
     urls:
     - https://compareasiagroup.github.io/helm-charts/sops-secrets-operator-0.1.8.tgz
     version: 0.1.8
-generated: "2020-03-02T15:23:13.184994+08:00"
+generated: "2020-04-07T16:15:09.886276+08:00"
