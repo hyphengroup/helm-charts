@@ -237,5 +237,5 @@ serviceAccount:
 
 statsd:
   enabled: true
-  image: statsd/stats:0.8.6
+  image: statsd/statsd:v0.8.6
   imagePullPolicy: "IfNotPresent"
