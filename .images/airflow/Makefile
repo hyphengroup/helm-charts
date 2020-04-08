@@ -8,7 +8,7 @@ TAG:=$(ECR_REGISTRY_URL)/$(ECR_REPO):$(AIRFLOW_VERSION)
 build: Dockerfile
 	docker build --rm \
 		--build-arg AIRFLOW_VERSION=$(AIRFLOW_VERSION) \
-                --build-arg AIRFLOW_DEPS="datadog,kubernetes,s3,statsd" \
+		--build-arg AIRFLOW_DEPS="datadog,kubernetes,s3,statsd" \
 		-t $(TAG) .
 
 docker/login:
