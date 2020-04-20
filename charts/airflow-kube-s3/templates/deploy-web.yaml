@@ -106,6 +106,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+              name: AIRFLOW__SCHEDULER__STATSD_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           resources:
             {{- toYaml .Values.airflow.web.resources | trim | nindent 12 }}
           volumeMounts:
