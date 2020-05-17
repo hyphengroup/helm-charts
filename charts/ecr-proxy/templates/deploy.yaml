@@ -1,0 +1,228 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "ecr-proxy.fullname" . }}
+  labels: {{ include "ecr-proxy.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+  selector:
+    matchLabels: {{ include "ecr-proxy.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
+      labels: {{ include "ecr-proxy.labels" . | nindent 8 }}
+    spec:
+      shareProcessNamespace: true
+      volumes:
+        - name: config # stores nginx.conf and nginx.pid
+          emptyDir: {}
+        - name: cache # stores temp cache
+          emptyDir: {}
+        {{- if .Values.conf.ssl.enabled }}
+        - name: ssl
+          secret:
+            secretName: {{ .Values.conf.ssl.secretRef  }}
+        {{-  end }}
+      # init config
+      initContainers:
+        - name: "init-conf"
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if gt (len .Values.conf.envFrom.secrets) 0 }}
+          envFrom:
+            {{- range .secrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+          {{- end }}
+          env:
+            - name: CONF_TARGET_PATH
+              value: "/opt/app/conf/nginx.conf"
+            {{- if .Values.conf.ssl.enabled }}
+            - name: CONF_SSL_KEY_PATH
+              value: "/etc/nginx/ssl/tls.key"
+            - name: CONF_SSL_CERT_PATH
+              value: "/etc/nginx/ssl/tls.crt"
+            - name: CONF_PROXY_PORT
+              value: "443"
+            {{- end }}
+            {{- range $k, $v := .Values.conf.env }}
+            - name: {{ $k }}
+              value: {{ $v | quote }}
+            {{- end }}
+          command: [ "ecr-proxy-conf" ]
+          args:
+            {{- if .Values.conf.ssl.enabled }}
+            - --ssl
+            {{- end }}
+            - init
+          volumeMounts:
+            - name: config  # stores nginx.conf and nginx.pid
+              mountPath: /opt/app/conf
+            - name: cache
+              mountPath: /cache
+            {{- if .Values.conf.ssl.enabled }}
+            # certs are tested by nginx -t
+            - name: ssl
+              mountPath: /etc/nginx/ssl
+            {{-  end }}
+          {{- with .Values.conf.resources }}
+          resources:
+            {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+      containers:
+        - name: "conf"
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if gt (len .Values.conf.envFrom.secrets) 0 }}
+          envFrom:
+            {{- range .Values.conf.envFrom.secrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+          {{- end }}
+          env:
+            - name: CONF_TARGET_PATH
+              value: "/opt/app/conf/nginx.conf"
+            - name: CONF_PID_PATH
+              value: "/opt/app/conf/nginx.pid"
+            {{- if .Values.conf.ssl.enabled }}
+            - name: CONF_SSL_KEY_PATH
+              value: "/etc/nginx/ssl/tls.key"
+            - name: CONF_SSL_CERT_PATH
+              value: "/etc/nginx/ssl/tls.crt"
+            - name: CONF_PROXY_PORT
+              value: "443"
+            {{- end }}
+            {{- range $k, $v := .Values.conf.env }}
+            - name: {{ $k }}
+              value: {{ $v | quote }}
+            {{- end }}
+          command: [ "ecr-proxy-conf" ]
+          args:
+            {{- if .Values.conf.ssl.enabled }}
+            - --ssl
+            {{- end }}
+            - loop
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: http
+            failureThreshold: 3
+            successThreshold: 1
+            periodSeconds: 5
+            timeoutSeconds: 1
+            initialDelaySeconds: 0
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: http
+            failureThreshold: 3
+            successThreshold: 1
+            periodSeconds: 10
+            timeoutSeconds: 1
+            initialDelaySeconds: 15
+          volumeMounts:
+            - name: config # stores nginx.conf and nginx.pid
+              mountPath: /opt/app/conf
+            - name: cache
+              mountPath: /cache
+            {{- if .Values.conf.ssl.enabled }}
+            # certs are tested by nginx -t
+            - name: ssl
+              mountPath: /etc/nginx/ssl
+            {{-  end }}
+          {{- with .Values.conf.resources }}
+          resources:
+            {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+        - name: nginx
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: [ "/usr/sbin/nginx" ]
+          args:
+          - -c
+          - /opt/app/conf/nginx.conf
+          - -g
+          - "pid /opt/app/conf/nginx.pid;"
+          ports:
+            {{- if .Values.conf.ssl.enabled }}
+            - containerPort: 443
+              name: https
+              protocol: TCP
+            {{- else }}
+            - containerPort: 80
+              name: http
+              protocol: TCP
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /v2/
+              {{- if .Values.conf.ssl.enabled }}
+              port: https
+              scheme: HTTPS
+              httpHeaders:
+                - name: Host
+                  value: {{ .Values.conf.ssl.host }}
+              {{- else }}
+              port: http
+              {{- end }}
+            failureThreshold: 3
+            successThreshold: 1
+            periodSeconds: 5
+            timeoutSeconds: 1
+            initialDelaySeconds: 0
+          livenessProbe:
+            httpGet:
+              path: /v2/
+              {{- if .Values.conf.ssl.enabled }}
+              port: https
+              scheme: HTTPS
+              httpHeaders:
+                - name: Host
+                  value: {{ .Values.conf.ssl.host }}
+              {{- else }}
+              port: http
+              {{- end }}
+            failureThreshold: 3
+            successThreshold: 1
+            periodSeconds: 10
+            timeoutSeconds: 1
+            initialDelaySeconds: 15
+          volumeMounts:
+            - name: config
+              mountPath: /opt/app/conf # stores nginx.conf and nginx.pid
+            - name: cache
+              mountPath: /cache
+            {{- if .Values.conf.ssl.enabled }}
+            - name: ssl
+              mountPath: /etc/nginx/ssl
+            {{-  end }}
+          {{- with .Values.nginx.resources }}
+          resources:
+            {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+      restartPolicy: Always
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+       {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+       {{- toYaml . | nindent 8 }}
+      {{- end }}

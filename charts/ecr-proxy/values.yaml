@@ -1,0 +1,77 @@
+# Default values for ecr-proxy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicas: 2
+
+# https://github.com/compareasiagroup/ecr-proxy-conf
+image:
+  repository: ecr-proxy-conf
+  tag: v0.1.0
+  pullPolicy: IfNotPresent
+
+conf:
+  ssl:
+    enabled: false
+    secretRef: ""
+    host: "" # required for https liveness / readiness
+  env:
+    AWS_REGION: "ap-southeast-1"
+  envFrom:
+    secrets:
+      - ecr-proxy-secrets
+  resources: 
+    limits:
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+nginx:
+  resources:
+    limits:
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 32Mi
+
+service:
+  annotations:
+    # external-dns.alpha.kubernetes.io/hostname: registry.mgmt.cag.systems
+    # service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    # service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+    # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: '*' # is this applicable to nlb??
+  sessionAffinity: "None"
+  sessionAffinityConfig: {}
+  type: LoadBalancer
+
+podAnnotations:
+  # # "source" is used for pipeline filter
+  # # "service" is used for log exploration
+  # ad.datadoghq.com/nginx.logs: |
+  #   [
+  #     {
+  #       "source":"nginx",
+  #       "service":"ecr-proxy"
+  #     }
+  #   ]
+  # ad.datadoghq.com/conf.logs: |
+  #   [
+  #     {
+  #       "source":"conf",
+  #       "service":"ecr-proxy"
+  #     }
+  #   ]
+  cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+
+afinity: 
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchExpressions:
+        - key: "app.kubernetes.io/name"
+          operator: In
+          values:
+          - ecr-proxy
+      topologyKey: "kubernetes.io/hostname"
+
+nodeSelector: {}
+tolerations: []

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "ecr-proxy.fullname" . }}
+  labels: {{ include "ecr-proxy.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | trim | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  selector: {{ include "ecr-proxy.matchLabels" . | nindent 4 }}
+  ports:
+    - protocol: TCP
+      {{- if .Values.conf.ssl.enabled }}
+      name: https
+      port: 443
+      targetPort: https
+      {{- else }}
+      name: http
+      port: 80
+      targetPort: http
+      {{- end }}
