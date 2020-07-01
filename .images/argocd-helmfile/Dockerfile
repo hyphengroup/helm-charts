@@ -10,6 +10,9 @@ USER root
 
 # Install tools needed for your repo-server to retrieve & decrypt secrets, render manifests
 # (e.g. curl, awscli, gpg, sops)
+# Newer version of argo (1.5.x onwards) replaces helm 2 with helm 3. While both binaries exist, 'helm'
+# points to helm3. This breaks many of our tools since we call helm directly
+# In order to maintain compatibility, we create our own softlink below
 RUN apt-get update && \
     apt-get install -y \
         curl \
@@ -24,7 +27,9 @@ RUN apt-get update && \
     echo "https://github.com/roboll/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_linux_amd64" && \
     curl -o /usr/local/bin/helmfile -L https://github.com/roboll/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_linux_amd64 && \
     chmod +x /usr/local/bin/helmfile && \
-    chmod +x /usr/local/bin/sops
+    chmod +x /usr/local/bin/sops && \
+    mv /usr/local/bin/helm /usr/local/bin/helm3 && \
+    ln --symbolic --verbose /usr/local/bin/helm2 /usr/local/bin/helm
 
 # Switch back to non-root user
 USER argocd
