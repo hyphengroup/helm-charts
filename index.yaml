@@ -3,7 +3,7 @@ entries:
   airflow-kube-s3:
   - apiVersion: v1
     appVersion: 1.10.9
-    created: "2020-07-15T16:54:03.221058+08:00"
+    created: "2020-07-21T09:29:01.022689+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 4465b903c1ce1cc9cfd15a50cf622e44de19116c8d959060f7d414e17c01c39c
     home: https://usr/local/airflow.apache.org/
@@ -22,7 +22,7 @@ entries:
     version: 0.0.3
   - apiVersion: v1
     appVersion: 1.10.9
-    created: "2020-07-15T16:54:03.218706+08:00"
+    created: "2020-07-21T09:29:01.020405+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 2c67adda73b0b78705d9b14419f9d4027074058585de8d492591d1fdedd1b5e5
     home: https://usr/local/airflow.apache.org/
@@ -41,7 +41,7 @@ entries:
     version: 0.0.3-alpha+005
   - apiVersion: v1
     appVersion: 1.10.9
-    created: "2020-07-15T16:54:03.219866+08:00"
+    created: "2020-07-21T09:29:01.021505+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: ece29ad46997cb0c3ee12e05ab65008e234cea619c17d3debda43192a35310f7
     home: https://usr/local/airflow.apache.org/
@@ -60,7 +60,7 @@ entries:
     version: 0.0.3-alpha+006
   - apiVersion: v1
     appVersion: 1.10.9
-    created: "2020-07-15T16:54:03.215239+08:00"
+    created: "2020-07-21T09:29:01.016785+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: eff3f12c6f87d7a6b283b261759cc2951f743753875cbf65d5f0e2e11eb54e80
     home: https://usr/local/airflow.apache.org/
@@ -79,7 +79,7 @@ entries:
     version: 0.0.3-alpha+002
   - apiVersion: v1
     appVersion: 1.10.9
-    created: "2020-07-15T16:54:03.216324+08:00"
+    created: "2020-07-21T09:29:01.017936+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 93ca1d3ce73a3edd2743ae5cfeeb5aa06a448651e55c4c7c9d89f73803ebfe44
     home: https://usr/local/airflow.apache.org/
@@ -98,7 +98,7 @@ entries:
     version: 0.0.3-alpha+003
   - apiVersion: v1
     appVersion: 1.10.9
-    created: "2020-07-15T16:54:03.217509+08:00"
+    created: "2020-07-21T09:29:01.019023+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 710adbf3ee13a5321620a148212977ca7404b00c25fb2d1a9e228f8290f7af02
     home: https://usr/local/airflow.apache.org/
@@ -117,7 +117,7 @@ entries:
     version: 0.0.3-alpha+004
   - apiVersion: v1
     appVersion: 1.10.9
-    created: "2020-07-15T16:54:03.213949+08:00"
+    created: "2020-07-21T09:29:01.015683+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 3b90b060b91ed5da481ec13bac570211d9faa42317bb1fbb377befbef1390091
     home: https://usr/local/airflow.apache.org/
@@ -136,7 +136,7 @@ entries:
     version: 0.0.3-alpha+001
   - apiVersion: v1
     appVersion: 1.10.7
-    created: "2020-07-15T16:54:03.212825+08:00"
+    created: "2020-07-21T09:29:01.014283+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: a3a31de284bd0fc17e2fa7225aa773a11857d7f9ee3c5e0be01328251bcbf052
     home: https://usr/local/airflow.apache.org/
@@ -155,7 +155,7 @@ entries:
     version: 0.0.2
   - apiVersion: v1
     appVersion: 1.10.7
-    created: "2020-07-15T16:54:03.209596+08:00"
+    created: "2020-07-21T09:29:01.012261+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 87bd47f39d58e3f2a33599a6d73e1df13913b79d5297655c496c0906acc6a0f5
     home: https://usr/local/airflow.apache.org/
@@ -175,7 +175,7 @@ entries:
   ecr-proxy:
   - apiVersion: v1
     appVersion: v0.1.0
-    created: "2020-07-15T16:54:03.221976+08:00"
+    created: "2020-07-21T09:29:01.023194+08:00"
     description: ECR Proxy
     digest: 18ecef2e7683517f8b33616ac799c601b1633d59c8b0b90ac78f3d019edc450b
     name: ecr-proxy
@@ -185,7 +185,7 @@ entries:
   kube-node-lifecycle-labeller:
   - apiVersion: v1
     appVersion: 1.15.3-1
-    created: "2020-07-15T16:54:03.222626+08:00"
+    created: "2020-07-21T09:29:01.024755+08:00"
     description: The lifecycle labeller fetches the LifeCycle attribute of a node
       and conditionally adds labels and taints based on EC2 lifecycle.
     digest: d83f10a04a249760b34ad27610120f1dbcaadcd8d1fc312b95c47562497ff8d6
@@ -206,7 +206,17 @@ entries:
   private-charts-repo:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2020-07-15T16:54:03.222933+08:00"
+    created: "2020-07-21T09:29:01.025846+08:00"
+    description: Nodejs http server clones a private GitHub or BitBucket repo and
+      serves the files.
+    digest: d34e89ab02ab84778a4731898824a95b1b181cc480b27943fb2042d1c480f5ca
+    name: private-charts-repo
+    urls:
+    - https://compareasiagroup.github.io/helm-charts/private-charts-repo-0.0.2.tgz
+    version: 0.0.2
+  - apiVersion: v1
+    appVersion: "1.0"
+    created: "2020-07-21T09:29:01.02551+08:00"
     description: Nodejs http server clones a private GitHub or BitBucket repo and
       serves the files.
     digest: 4481997b5e65798b69b21e4bc5af228f3cfaed7c21685438de653abf752a9c77
@@ -217,7 +227,7 @@ entries:
   sops-secrets-operator:
   - apiVersion: v1
     appVersion: 0.0.10
-    created: "2020-07-15T16:54:03.223828+08:00"
+    created: "2020-07-21T09:29:01.026636+08:00"
     description: sops secrets operator
     digest: ceb5cc87d4093d00569d25a40e0407a3d879866b2e6aa730b030f6983cb36bb8
     maintainers:
@@ -231,7 +241,7 @@ entries:
     version: 0.1.10
   - apiVersion: v1
     appVersion: 0.0.9
-    created: "2020-07-15T16:54:03.224672+08:00"
+    created: "2020-07-21T09:29:01.0271+08:00"
     description: sops secrets operator
     digest: f46e2f0f9924663393feea5d56670c63165ec6e953f4a891892630de267702ea
     maintainers:
@@ -243,4 +253,4 @@ entries:
     urls:
     - https://compareasiagroup.github.io/helm-charts/sops-secrets-operator-0.1.8.tgz
     version: 0.1.8
-generated: "2020-07-15T16:54:03.208204+08:00"
+generated: "2020-07-21T09:29:01.009621+08:00"
