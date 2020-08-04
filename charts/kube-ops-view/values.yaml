@@ -1,0 +1,54 @@
+# Declare variables to be passed into your templates.
+replicaCount: 1 # more than 1 requires redis
+image:
+  repository: hjacobs/kube-ops-view
+  tag: 0.12
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 8080
+resources:
+  limits:
+    memory: 128Mi
+  requests:
+    cpu: 80m
+    memory: 64Mi
+ingress:
+  enabled: false
+  path: /
+  hostname: kube-ops-view.internal.example.com
+  annotations: {}
+  ## Ingress annotations
+  #   kubernetes.io/ingress.class: "contour-internal"
+  #   external-dns.example.com/enable: "true"
+  #   external-dns.alpha.kubernetes.io/target: "example-svc-tesla-int-contour-e6d2b4ffa6773814.elb.ap-southeast-1.amazonaws.com"
+  tls: []
+  ## Secrets must be manually created in the namespace
+  #   - secretName: internal-example-com-wildcard-tls
+  #     hosts:
+  #     - kube-ops-view.internal.example.com
+
+linkTemplates: {}
+  # node: "https://kube-web-view.example.org/clusters/{cluster}/nodes/{name}"
+  # pod:  "https://kube-web-view.example.org/clusters/{cluster}/namespaces/{namespace}/pods/{name}"
+
+podAnnotations: {}
+affinity: {}
+tolerations: []
+
+secrets:
+  config: ""
+  
+# Add securityContext
+securityContext: {}
+
+# Defaults for Redis
+redis:
+  enabled: false
+  usePassword: false
+  cluster:
+    enabled: false
+  master:
+    persistence:
+      enabled: false

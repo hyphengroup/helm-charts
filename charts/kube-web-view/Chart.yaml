@@ -1,0 +1,15 @@
+apiVersion: v1
+name: kube-web-view
+version: 0.2.1
+appVersion: 19.8.3
+description: Kubernetes Web View to list and view all Kubernetes resources
+keywords:
+- kubernetes
+- dashboard
+- operations
+home: https://kube-web-view.readthedocs.io/
+sources:
+- https://codeberg.org/hjacobs/kube-web-view
+maintainers:
+- name: hjacobs
+  email: henning@jacobs1.de

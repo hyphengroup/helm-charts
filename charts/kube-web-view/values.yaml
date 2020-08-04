@@ -1,0 +1,59 @@
+# Declare variables to be passed into your templates.
+replicaCount: 1
+image:
+  repository: hjacobs/kube-web-view
+  # see https://codeberg.org/hjacobs/kube-web-view/releases
+  tag: 19.8.3
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 8080
+resources:
+  limits:
+    memory: 100Mi
+  requests:
+    cpu: 5m
+    memory: 100Mi
+ingress:
+  enabled: false
+  path: /
+  hostname: kube-web-view.internal.swatmobile.io
+  annotations: {}
+  # # Ingress annotations
+  #   kubernetes.io/ingress.class: "contour-internal"
+  #   external-dns.swatmobile.io/enable: "true"
+  #   external-dns.alpha.kubernetes.io/target: "swat-svc-tesla-int-contour-e6d2b4ffa6773814.elb.ap-southeast-1.amazonaws.com"
+  tls: []
+  # # Secrets must be manually created in the namespace
+  #   - secretName: internal-swatmobile-io-wildcard-tls
+  #     hosts:
+  #       - kube-web-view.internal.swatmobile.io
+config:
+  defaultLabelColumns: pods=release;deployments=release;nodes=beta.kubernetes.io/instance-type,failure-domain.beta.kubernetes.io/zone
+  objectLinks: nodes=https://app.datadoghq.com/infrastructure?filter={name},pods=https://app.datadoghq.com/process?tags=pod_name%3A{name}%2Ckubernetescluster%3A{cluster},daemonsets=https://app.datadoghq.com/containers?tags=kubernetescluster%3A{cluster}%2Ckube_daemon_set%3A{name},deployments=https://app.datadoghq.com/containers?tags=kubernetescluster%3A{cluster}%2Ckube_deployment%3A{name}
+  showContainerLogs: false
+  # Enable showSecrets unhide secret data
+  # see also https://kube-web-view.readthedocs.io/en/latest/security.html
+  showSecrets: false
+  sidebar:
+    resourceTypes: Cluster Resources=namespaces,nodes,persistentvolumes;Controllers=deployments,cronjobs,jobs,daemonsets,statefulsets,certificates,orders,challenges;Pod Management=ingresses,services,pods,configmaps,horizontalpodautoscalers,limitranges
+  search:
+    defaultResourceTypes: namespaces,deployments,services,ingresses,statefulsets,cronjobs
+    offeredResourceTypes: namespaces,deployments,replicasets,services,ingresses,daemonsets,statefulsets,cronjobs,pods,nodes
+    maxConcurrency: 100 # default 100
+
+# ensure emtpyDir doesn't block autoscaler
+podAnnotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+affinity: {}
+tolerations: []
+
+secrets:
+  config: ""
+  
+# Add securityContext
+securityContext:
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
