@@ -18,6 +18,10 @@ build/socat: ## Build custom image for socat
 	docker build --rm \
 		-t $(ECR_URL)/thirdparty/socat:latest socat
 
+build/yq: ## Build custom image for yq
+	docker build --rm \
+		-t $(ECR_URL)/thirdparty/yq:latest yq
+
 build/argocd/%: ## Build custom image for argocd with helmfile
 	docker build --rm \
 		--build-arg ARGO_VERSION="$*" \

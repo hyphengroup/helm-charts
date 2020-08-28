@@ -1,0 +1,30 @@
+name: Publish yq to ECR
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - '.images/yq/**'
+    - '.github/workflows/push-yq.yml'
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    
+    - name: Build image
+      run: make build
+      working-directory: .images/yq
+      env:
+        ECR_REGISTRY_URL: ${{ secrets.ECR_REGISTRY_URL }}
+
+    - name: Push image to ECR
+      run: make push
+      working-directory: .images/yq
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
+        ECR_REGISTRY_URL: ${{ secrets.ECR_REGISTRY_URL }}
+        ECR_REGION: ${{ secrets.ECR_REGION }}
