@@ -43,18 +43,14 @@ initContainers:
   resources: {}
 {{- end }}
   securityContext:
-    allowPrivilegeEscalation: {{ .Values.global.proxy.privileged }}
+    runAsUser: 0
+    runAsNonRoot: false
     capabilities:
       add:
       - NET_ADMIN
-      - NET_RAW
-      drop:
-      - ALL
-    privileged: {{ .Values.global.proxy.privileged }}
-    readOnlyRootFilesystem: false
-    runAsGroup: 0
-    runAsNonRoot: false
-    runAsUser: 0
+    {{- if .Values.global.proxy.privileged }}
+    privileged: true
+    {{- end }}
   restartPolicy: Always
 {{- end }}
 {{  end -}}
@@ -69,17 +65,9 @@ initContainers:
   imagePullPolicy: IfNotPresent
   resources: {}
   securityContext:
-    allowPrivilegeEscalation: true
-    capabilities:
-      add:
-      - SYS_ADMIN
-      drop:
-      - ALL
-    privileged: true
-    readOnlyRootFilesystem: false
-    runAsGroup: 0
-    runAsNonRoot: false
     runAsUser: 0
+    runAsNonRoot: false
+    privileged: true
 {{ end }}
 {{- end }}
 containers:
@@ -168,10 +156,6 @@ containers:
 {{- if .Values.global.trustDomain }}
   - --trust-domain={{ .Values.global.trustDomain }}
 {{- end }}
-{{- if .Values.global.proxy.lifecycle }}
-  lifecycle:
-    {{ toYaml .Values.global.proxy.lifecycle | indent 4 }}
-{{- end }}
   env:
   - name: POD_NAME
     valueFrom:
@@ -180,13 +164,9 @@ containers:
   - name: ISTIO_META_POD_PORTS
     value: |-
       [
-      {{- $first := true }}
       {{- range $index1, $c := .Spec.Containers }}
         {{- range $index2, $p := $c.Ports }}
-          {{- if (structToJSON $p) }}
-          {{if not $first}},{{end}}{{ structToJSON $p }}
-          {{- $first = false }}
-          {{- end }}
+          {{if or (ne $index1 0) (ne $index2 0)}},{{end}}{{ structToJSON $p }}
         {{- end}}
       {{- end}}
       ]
@@ -300,22 +280,21 @@ containers:
     failureThreshold: {{ annotation .ObjectMeta `readiness.status.sidecar.istio.io/failureThreshold` .Values.global.proxy.readinessFailureThreshold }}
   {{ end -}}
   securityContext:
-    allowPrivilegeEscalation: {{ .Values.global.proxy.privileged }}
+    {{- if .Values.global.proxy.privileged }}
+    privileged: true
+    {{- end }}
+    {{- if ne .Values.global.proxy.enableCoreDump true }}
+    readOnlyRootFilesystem: true
+    {{- end }}
+    {{ if eq (annotation .ObjectMeta `sidecar.istio.io/interceptionMode` .ProxyConfig.InterceptionMode) `TPROXY` -}}
     capabilities:
-      {{ if eq (annotation .ObjectMeta `sidecar.istio.io/interceptionMode` .ProxyConfig.InterceptionMode) `TPROXY` -}}
       add:
       - NET_ADMIN
-      {{- end }}
-      drop:
-      - ALL
-    privileged: {{ .Values.global.proxy.privileged }}
-    readOnlyRootFilesystem: {{ not .Values.global.proxy.enableCoreDump }}
     runAsGroup: 1337
-    {{ if eq (annotation .ObjectMeta `sidecar.istio.io/interceptionMode` .ProxyConfig.InterceptionMode) `TPROXY` -}}
-    runAsNonRoot: false
-    runAsUser: 0
-    {{- else -}}
-    runAsNonRoot: true
+    {{ else -}}
+    {{ if .Values.global.sds.enabled }}
+    runAsGroup: 1337
+    {{- end }}
     runAsUser: 1337
     {{- end }}
   resources:

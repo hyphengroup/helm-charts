@@ -75,8 +75,6 @@ spec:
         chart: {{ template "grafana.chart" . }}
         heritage: {{ .Release.Service }}
         release: {{ .Release.Name }}
-      annotations:
-        sidecar.istio.io/inject: "false"
     spec:
       serviceAccountName: istio-grafana-post-install-account
       containers:
