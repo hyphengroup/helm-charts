@@ -69,7 +69,7 @@ service:
   annotations: {}
   name: http
   type: ClusterIP
-  externalPort: 80
+  externalPort: 9411
 
 ingress:
   enabled: false
