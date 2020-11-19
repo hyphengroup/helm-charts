@@ -4,13 +4,15 @@ ECR_REPO:=thirdparty/atlantis
 
 ATLANTIS_VERSION=v0.14.0
 TERRAGRUNT_VERSION=v0.21.11
-VERSION:=0.0.1
+TERRAFORM_VERSION=0.12.29   # notice no `v` prefix
+VERSION:=0.0.2
 TAG:=$(ECR_REGISTRY_URL)/$(ECR_REPO):$(VERSION)
 
 build: Dockerfile
 	docker build --rm \
 		--build-arg ATLANTIS_VERSION=$(ATLANTIS_VERSION) \
 		--build-arg TERRAGRUNT_VERSION=$(TERRAGRUNT_VERSION) \
+		--build-arg TERRAFORM_VERSION=$(TERRAFORM_VERSION) \
 		-t $(TAG) .
 
 docker/login:
