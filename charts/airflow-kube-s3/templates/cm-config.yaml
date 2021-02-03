@@ -328,6 +328,9 @@ data:
     [kubernetes_annotations]
     # The Key-value annotations pairs to be given to worker pods.
     # Should be supplied in the format: key = value
+    {{- with .Values.airflow.workers.annotations }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
 
     [kubernetes_environment_variables]
     # The scheduler sets the following environment variables into your workers. You may define as
