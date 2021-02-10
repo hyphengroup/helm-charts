@@ -1,7 +1,7 @@
 .PHONY: build docker/login push
 
 ECR_REPO:=thirdparty/argocd-helmfile
-ARGO_VERSION:=1.8.2
+ARGO_VERSION:=1.8.3
 SOPS_VERSION:=3.5.0
 HELMFILE_VERSION:=0.98.1
 
