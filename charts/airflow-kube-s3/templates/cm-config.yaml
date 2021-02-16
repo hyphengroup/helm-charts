@@ -4,6 +4,137 @@ metadata:
   name: {{ template "airflow-kube-s3.fullname" . }}-config
   labels: {{ include "airflow-kube-s3.labels" . | nindent 4 }}
 data:
+  pod_template.yaml: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: dummy-name-dont-delete
+      namespace: dummy-name-dont-delete
+      labels: {{ include "airflow-kube-s3.labels" . | nindent 8 }}
+        app.kubernetes.io/component: worker
+      annotations:
+        {{- with .Values.airflow.podAnnotations }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
+        {{- with .Values.airflow.workers.annotations }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
+    spec:
+      initContainers:
+        - name: git-sync
+          image: {{ .Values.airflow.dags.git.image.repository}}:{{ .Values.airflow.dags.git.image.tag}}
+          imagePullPolicy: {{ .Values.airflow.dags.git.image.pullPolicy | quote }}
+          volumeMounts:
+            - name: airflow-dags
+              mountPath: {{ .Values.airflow.dags.git.root }}
+            - name: git-sync-ssh-configmap
+              mountPath: /etc/git-secret/known_hosts
+              subPath: known_hosts
+            - name: git-sync-ssh-secrets
+              mountPath: /etc/git-secret/ssh
+              subPath: ssh
+          env:
+            - name: GIT_SYNC_REPO
+              value: {{ .Values.airflow.dags.git.url }}
+            - name: GIT_SYNC_BRANCH
+              value: {{ .Values.airflow.dags.git.branch }}
+            - name: GIT_SYNC_DEPTH
+              value: {{ .Values.airflow.dags.git.depth | quote }}
+            - name: GIT_SYNC_ROOT
+              value: {{ .Values.airflow.dags.git.root }}
+            - name: GIT_SYNC_DEST
+              value: {{ .Values.airflow.dags.git.dest }}
+              # the number of seconds between syncs
+            - name: GIT_SYNC_WAIT
+              value: {{ .Values.airflow.dags.git.wait | quote }}
+              # using secret and configmap for cloning over SSH
+            - name: GIT_SSH_KEY_FILE
+              value: /etc/git-secret/ssh
+            - name: GIT_SYNC_SSH
+              value: "true"
+            - name: GIT_SYNC_ADD_USER
+              value: {{ .Values.airflow.dags.git.addUser | quote }}
+            - name: GIT_KNOWN_HOSTS
+              value:  {{ .Values.airflow.dags.git.ssh.strictHostKeyChecking | quote }}
+            - name: GIT_SSH_KNOWN_HOSTS_FILE
+              value: /etc/git-secret/known_hosts
+            - name: GIT_SYNC_ONE_TIME
+              value: "true"
+          resources:
+            {{- toYaml .Values.airflow.dags.git.resources | trim | nindent 12 }}
+      containers:
+        - name: base
+          args: []
+          command: []
+          envFrom:
+            {{- range .Values.airflow.envFrom.configMaps }}
+            - configMapRef:
+                name: {{ . }}
+            {{- end }}
+            - configMapRef:
+                name: {{ template "airflow-kube-s3.fullname" . }}-env
+            {{- if .Values.airflow.secrets.create }}
+            - secretRef:
+                name: {{ template "airflow-kube-s3.fullname" . }}-env
+            {{- end }}
+            {{- range .Values.airflow.envFrom.secrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+          env:
+            - name: AIRFLOW__KUBERNETES__NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: AIRFLOW__CORE__EXECUTOR
+              value: LocalExecutor
+          resources:
+            {{- toYaml .Values.airflow.workers.resources | trim | nindent 12 }}
+          volumeMounts:
+            - name: airflow-config
+              mountPath: /usr/local/airflow/airflow.cfg
+              subPath: airflow.cfg
+            - name: airflow-config
+              mountPath: /usr/local/airflow/pod_template.yaml
+              subPath: pod_template.yaml
+            - name: airflow-dags
+              mountPath: {{ .Values.airflow.dags.git.folderMountPoint }}
+          image: {{ .Values.airflow.image.repository }}:{{ .Values.airflow.image.tag }}
+          imagePullPolicy: {{ .Values.airflow.image.pullPolicy }}
+          ports: []
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      hostNetwork: false
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 65533
+      nodeSelector:
+        {}
+      affinity:
+        {}
+      tolerations:
+        []
+      serviceAccountName: {{ include "airflow-kube-s3.serviceAccountName" . | quote }}
+      
+      volumes:
+        - name: airflow-dags
+          emptyDir: {}
+        - name: airflow-config
+          configMap:
+            name: {{ template "airflow-kube-s3.fullname" . }}-config
+            defaultMode: 0420
+        - name: git-sync-ssh-configmap
+          configMap:
+            name: {{ .Values.airflow.dags.git.ssh.knownHostsConfigMapRef }}
+            defaultMode: 0440
+        - name: git-sync-ssh-secrets
+          secret:
+            secretName: {{ .Values.airflow.dags.git.ssh.keySecretRef }}
+            items:
+              - key: gitSshKey
+                path: ssh
+                mode: 0440
   airflow.cfg: |
     [core]
     # The folder where your airflow pipelines live, most likely a
@@ -214,70 +345,28 @@ data:
     hide_sensitive_variable_fields = True
 
     [kubernetes]
-    # The name of the Kubernetes ConfigMap Containing the Airflow Configuration (this file)
-    airflow_configmap = {{ template "airflow-kube-s3.fullname" . }}-config
+    # Path to the YAML pod file. If set, all other kubernetes-related fields are ignored.
+    # (This feature is experimental)
+    pod_template_file = /usr/local/airflow/pod_template.yaml
+
+    # Airflow potentially overwrites the base image: from the airflow.cfg or per dag using pod_override in kubeExecutor
     worker_container_repository = {{ .Values.airflow.image.repository }}
     worker_container_tag = {{ .Values.airflow.image.tag }}
     worker_container_image_pull_policy = {{ .Values.airflow.image.pullPolicy }}
+    
+    # If True, all worker pods will be deleted upon termination
     delete_worker_pods = True
+
+    # If False (and delete_worker_pods is True),
+    # failed worker pods will not be deleted so users can investigate them.
+    delete_worker_pods_on_failure = {{ .Values.airflow.workers.deleteOnFailure }}
 
     # For docker image already contains DAGs, this is set to `True`, and the worker will search for dags in dags_folder,
     # otherwise use git sync or dags volume claim to mount DAGs
     dags_in_image = False
-    
-    git_sync_root = {{ .Values.airflow.dags.git.root }}
-    git_sync_dest = {{ .Values.airflow.dags.git.dest }}
-
-    git_repo = {{ .Values.airflow.dags.git.url }}
-    git_branch = {{ .Values.airflow.dags.git.branch }}
-    git_subpath = {{ .Values.airflow.dags.git.subpath }}
-    # The specific rev or hash the git_sync init container will checkout
-    # This becomes GIT_SYNC_REV environment variable in the git_sync init container for worker pods
-    git_sync_rev =
-
-    # Mount point of the volume of git-sync into workers, web and scheduler
-    git_dags_folder_mount_point = {{ .Values.airflow.dags.git.folderMountPoint }}
-
-    # for cloning dags from git repositories into volumes: https://github.com/kubernetes/git-sync
-    git_sync_container_repository = {{ .Values.airflow.dags.git.image.repository}}
-    git_sync_container_tag = {{ .Values.airflow.dags.git.image.tag}}
-    git_sync_init_container_name = git-sync-clone
-    git_sync_run_as_user = 65533
 
     # Number of Kubernetes Worker Pod creation calls per scheduler loop
     worker_pods_creation_batch_size = 1
-
-    {{- $ref := printf "%s-env" (include "airflow-kube-s3.fullname" . )}}
-    
-    # A list of configMapsRefs to envFrom. If more than one configMap is
-    # specified, provide a comma separated list: configmap_a,configmap_b
-    env_from_configmap_ref = {{ concat (list $ref) .Values.airflow.envFrom.configMaps | join "," }}
-
-    # A list of secretRefs to envFrom. If more than one secret is
-    # specified, provide a comma separated list: secret_a,secret_b
-    {{- if .Values.airflow.secrets.create }}
-    env_from_secret_ref = {{ concat (list $ref) .Values.airflow.envFrom.secrets | join "," }}
-    {{- else }}
-    env_from_secret_ref = {{ .Values.airflow.envFrom.secrets | join "," }}
-    {{- end }}
-    
-    # Use git_ssh_key_secret_name and git_ssh_known_hosts_configmap_name
-    # for SSH authentication
-    git_ssh_key_secret_name = {{ .Values.airflow.dags.git.ssh.keySecretRef }}
-    {{- if .Values.airflow.dags.git.ssh.strictHostKeyChecking }}
-    # ref: https://sourcegraph.com/github.com/apache/airflow@1.10.7/-/blob/airflow/contrib/kubernetes/worker_configuration.py#L129:29
-    git_ssh_known_hosts_configmap_name = {{ .Values.airflow.dags.git.ssh.knownHostsConfigMapRef }}
-    {{- end }}
-
-    # The name of the Kubernetes service account to be associated with airflow workers, if any.
-    # Service accounts are required for workers that require access to secrets or cluster resources.
-    # See the Kubernetes RBAC documentation for more:
-    #   https://kubernetes.io/docs/admin/authorization/rbac/
-    worker_service_account_name = {{ template "airflow-kube-s3.serviceAccountName" . }}
-
-    # Any image pull secrets to be given to worker pods, If more than one secret is
-    # required, provide a comma separated list: secret_a,secret_b
-    image_pull_secrets =
 
     # Use the service account kubernetes gives to pods to connect to kubernetes cluster.
     # It's intended for clients that expect to be running inside a pod running on kubernetes.
@@ -289,16 +378,6 @@ data:
     # cluster_context =
     # config_file =
 
-    # Affinity configuration as a single line formatted JSON object.
-    # See the affinity model for top-level key names (e.g. `nodeAffinity`, etc.):
-    #   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#affinity-v1-core
-    affinity =
-
-    # A list of toleration objects as a single line formatted JSON array
-    # See:
-    #   https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#toleration-v1-core
-    tolerations =
-
     # **kwargs parameters to pass while calling a kubernetes client core_v1_api methods from Kubernetes Executor
     # provided as a single line formatted JSON dictionary string.
     # List of supported params in **kwargs are similar for all core_v1_apis, hence a single config variable for all apis
@@ -308,60 +387,10 @@ data:
     # api responses, which will cause the scheduler to hang. The timeout is specified as [connect timeout, read timeout]
     kube_client_request_args = {"_request_timeout" : [60,60] }
 
-    # Worker pods security context options
-    # See:
-    #   https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-
-    # Specifies the uid to run the first process of the worker pods containers as
-    run_as_user =
-
-    # Specifies a gid to associate with all containers in the worker pods
-    # if using a git_ssh_key_secret_name use an fs_group
-    # that allows for the key to be read, e.g. 65533
-    fs_group = 65533
-
-    [kubernetes_node_selectors]
-    # The Key-value pairs to be given to worker pods.
-    # The worker pods will be scheduled to the nodes of the specified key-value pairs.
-    # Should be supplied in the format: key = value
-
-    [kubernetes_annotations]
-    # The Key-value annotations pairs to be given to worker pods.
-    # Should be supplied in the format: key = value
-    {{- with .Values.airflow.workers.annotations }}
-    {{- toYaml . | trim | nindent 4 }}
-    {{- end }}
-
-    [kubernetes_environment_variables]
-    # The scheduler sets the following environment variables into your workers. You may define as
-    # many environment variables as needed and the kubernetes launcher will set them in the launched workers.
-    # Environment variables in this section are defined as follows
-    #     <environment_variable_key> = <environment_variable_value>
-    #
-    # For example if you wanted to set an environment variable with value `prod` and key
-    # `ENVIRONMENT` you would follow the following format:
-    #     ENVIRONMENT = prod
-    #
-    # Additionally you may override worker airflow settings with the AIRFLOW__<SECTION>__<KEY>
-    # formatting as supported by airflow normally.
-
-    [kubernetes_secrets]
-    # The scheduler mounts the following secrets into your workers as they are launched by the
-    # scheduler. You may define as many secrets as needed and the kubernetes launcher will parse the
-    # defined secrets and mount them as secret environment variables in the launched workers.
-    # Secrets in this section are defined as follows
-    #     <environment_variable_mount> = <kubernetes_secret_object>=<kubernetes_secret_key>
-    #
-    # For example if you wanted to mount a kubernetes secret key named `postgres_password` from the
-    # kubernetes secret object `airflow-secret` as the environment variable `POSTGRES_PASSWORD` into
-    # your workers you would follow the following format:
-    #     POSTGRES_PASSWORD = airflow-secret=postgres_credentials
-    #
-    # Additionally you may override worker airflow settings with the AIRFLOW__<SECTION>__<KEY>
-    # formatting as supported by airflow normally.
-
-    [kubernetes_labels]
-    # The Key-value pairs to be given to worker pods.
-    # The worker pods will be given these static labels, as well as some additional dynamic labels
-    # to identify the task.
-    # Should be supplied in the format: key = value
+    # Optional keyword arguments to pass to the ``delete_namespaced_pod`` kubernetes client
+    # ``core_v1_api`` method when using the Kubernetes Executor.
+    # This should be an object and can contain any of the options listed in the ``v1DeleteOptions``
+    # class defined here:
+    # https://github.com/kubernetes-client/python/blob/41f11a09995efcd0142e25946adc7591431bfb2f/kubernetes/client/models/v1_delete_options.py#L19
+    # Example: delete_option_kwargs = {"grace_period_seconds": 10}
+    delete_option_kwargs =

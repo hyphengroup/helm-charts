@@ -32,7 +32,7 @@ test/charts/%: ## Lint, Render and dry-run Chart against current context
 	-rm -rf charts/$*/test/
 	mkdir -p charts/$*/test/
 	helm template -n $* --output-dir charts/$*/test charts/$*
-	kubectl apply --dry-run -f charts/$*/test/$*/templates/
+	kubectl apply --dry-run=server -f charts/$*/test/$*/templates/
 
 push/charts/%: gh-pages ## Package & Push chart
 	helm package charts/$*/ -d gh-pages/

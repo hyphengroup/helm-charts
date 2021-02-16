@@ -73,6 +73,8 @@ spec:
               value: /etc/git-secret/ssh
             - name: GIT_SYNC_SSH
               value: "true"
+            - name: GIT_SYNC_ADD_USER
+              value: {{ .Values.airflow.dags.git.addUser | quote }}
             - name: GIT_KNOWN_HOSTS
               value: {{ .Values.airflow.dags.git.ssh.strictHostKeyChecking | quote }}
             - name: GIT_SSH_KNOWN_HOSTS_FILE
