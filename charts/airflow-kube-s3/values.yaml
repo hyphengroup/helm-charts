@@ -135,7 +135,7 @@ airflow:
   # Airflow RBAC
   rbac:
     # Use FAB-based webserver with RBAC feature, requires setting web.fabConfig
-    enabled: false
+    enabled: true
     users: []
       # ## Initial rbac users can be defined here as a list of maps.
       # - firstname: "Jon"
@@ -195,13 +195,13 @@ airflow:
       basedir = os.path.abspath(os.path.dirname(__file__))
       
       # Flask-WTF flag for CSRF
-      CSRF_ENABLED = True
+      WTF_CSRF_ENABLED = True
 
       # The SQLAlchemy connection string.
       SQLALCHEMY_DATABASE_URI = conf.get('core', 'SQL_ALCHEMY_CONN')
       AUTH_TYPE = AUTH_DB
       # Will allow user self registration
-      AUTH_USER_REGISTRATION = True
+      AUTH_USER_REGISTRATION = False
       # The default user self registration role
       AUTH_USER_REGISTRATION_ROLE = "User"
   workers:
