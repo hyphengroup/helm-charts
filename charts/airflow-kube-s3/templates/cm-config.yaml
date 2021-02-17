@@ -67,6 +67,9 @@ data:
       hostNetwork: false
       restartPolicy: Never
       terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
       nodeSelector:
         {}
       affinity:
