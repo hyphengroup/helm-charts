@@ -1,4 +1,4 @@
-{{- if .Values.airflow.podDisruptionBudgetEnabled }}
+{{- if .Values.airflow.scheduler.podDisruptionBudgetEnabled }}
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
@@ -8,5 +8,5 @@ spec:
   selector:
     matchLabels: {{ include "airflow-kube-s3.matchLabels" . | nindent 6 }}
       app.kubernetes.io/component: scheduler
-  {{ toYaml .Values.airflow.podDisruptionBudget | nindent 2 }}
+  {{- toYaml .Values.airflow.scheduler.podDisruptionBudget | nindent 2 -}}
 {{- end }}

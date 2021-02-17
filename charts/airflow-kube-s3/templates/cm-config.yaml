@@ -109,7 +109,6 @@ data:
       terminationGracePeriodSeconds: 30
       securityContext:
         runAsUser: 65533
-        fsGroup: 1000
       nodeSelector:
         {}
       affinity:
@@ -124,7 +123,7 @@ data:
         - name: airflow-config
           configMap:
             name: {{ template "airflow-kube-s3.fullname" . }}-config
-            defaultMode: 0420
+            defaultMode: 0644 #420
         - name: git-sync-ssh-configmap
           configMap:
             name: {{ .Values.airflow.dags.git.ssh.knownHostsConfigMapRef }}
