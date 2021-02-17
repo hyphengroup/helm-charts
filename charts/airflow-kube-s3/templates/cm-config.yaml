@@ -66,6 +66,8 @@ data:
           ports: []
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+        
+        {{- if .Values.airflow.workers.debug }}
         - name: debug
           args: []
           command:
@@ -112,6 +114,7 @@ data:
           ports: []
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+          {{- end }}
       hostNetwork: false
       restartPolicy: Never
       terminationGracePeriodSeconds: 30

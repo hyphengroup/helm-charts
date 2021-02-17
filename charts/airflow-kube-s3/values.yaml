@@ -205,6 +205,8 @@ airflow:
       AUTH_USER_REGISTRATION_ROLE = "User"
   workers:
     deleteOnFailure: "True"
+    # debug creates a side car container which sleeps 1000s
+    debug: false
     ## Pod Annotations for the worker pods created by the scheduler (pod_template)
     annotations: {}
     resources: {}
