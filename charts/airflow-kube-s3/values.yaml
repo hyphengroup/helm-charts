@@ -207,13 +207,7 @@ airflow:
     deleteOnFailure: "True"
     ## Pod Annotations for the worker pods created by the scheduler (pod_template)
     annotations: {}
-    resources:
-      limits:
-        cpu: "100m"
-        memory: "64Mi"
-      requests:
-        cpu: "10m"
-        memory: "32Mi"
+    resources: {}
 ## Ingress configuration
 ingress:
   ## enable ingress

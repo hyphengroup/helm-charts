@@ -48,8 +48,10 @@ data:
                   fieldPath: metadata.namespace
             - name: AIRFLOW__CORE__EXECUTOR
               value: LocalExecutor
+          {{- with .Values.airflow.workers.resources }}
           resources:
-            {{- toYaml .Values.airflow.workers.resources | trim | nindent 12 }}
+            {{- . | trim | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: airflow-config
               mountPath: /usr/local/airflow/airflow.cfg
@@ -69,8 +71,7 @@ data:
           command:
           - bash
           - -c
-          - sleep
-          - 10
+          - "sleep 1000"
           envFrom:
             {{- range .Values.airflow.envFrom.configMaps }}
             - configMapRef:
@@ -93,8 +94,10 @@ data:
                   fieldPath: metadata.namespace
             - name: AIRFLOW__CORE__EXECUTOR
               value: LocalExecutor
+          {{- with .Values.airflow.workers.resources }}
           resources:
-            {{- toYaml .Values.airflow.workers.resources | trim | nindent 12 }}
+            {{- . | trim | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: airflow-config
               mountPath: /usr/local/airflow/airflow.cfg
