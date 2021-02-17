@@ -74,6 +74,8 @@ Create a random string if the supplied key does not exist
   - name: git-sync-ssh-secrets
     mountPath: /etc/git-secret/ssh
     subPath: ssh
+  securityContext:
+    runAsUser: 1000
   env:
   - name: GIT_SYNC_REPO
     value: {{ .Values.airflow.dags.git.url }}
@@ -83,6 +85,8 @@ Create a random string if the supplied key does not exist
     value: {{ .Values.airflow.dags.git.root }}
   - name: GIT_SYNC_DEST
     value: {{ .Values.airflow.dags.git.dest }}
+  - name: GIT_SYNC_DEPTH
+    value: {{ .Values.airflow.dags.git.depth | quote }}
   # the number of seconds between syncs
   - name: GIT_SYNC_WAIT
     value: {{ .Values.airflow.dags.git.wait | quote }}
@@ -92,7 +96,7 @@ Create a random string if the supplied key does not exist
   - name: GIT_SYNC_SSH
     value: "true"
   - name: GIT_SYNC_ADD_USER
-    value: {{ .Values.airflow.dags.git.addUser | quote }}
+    value: "true"
   - name: GIT_KNOWN_HOSTS
     value:  {{ .Values.airflow.dags.git.ssh.strictHostKeyChecking | quote }}
   - name: GIT_SSH_KNOWN_HOSTS_FILE

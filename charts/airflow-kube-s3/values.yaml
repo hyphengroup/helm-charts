@@ -83,7 +83,6 @@ airflow:
       wait: 60
       ## How often (in seconds) to scan the DAGs directory for new files.
       dirListInterval: 120
-      addUser: "false"
       depth: 0 # shallow clone - the default
       ## Configure git-sync image & version
       image:
