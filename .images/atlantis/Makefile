@@ -2,7 +2,7 @@
 
 ECR_REPO:=thirdparty/atlantis
 
-ATLANTIS_VERSION=0.18.0-alpha
+ATLANTIS_VERSION=v0.18.0-alpha
 TERRAGRUNT_VERSION=v0.21.11
 TERRAFORM_VERSION=0.12.29   # notice no `v` prefix
 VERSION:=0.0.4-alpha
