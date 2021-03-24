@@ -1,8 +1,8 @@
 include .env
 export $(shell sed 's/=.*//' .env)
 
-REPO := git@github.com:compareasiagroup/helm-charts.git
-URL := https://compareasiagroup.github.io/helm-charts/
+REPO := git@github.com:hyphengroup/helm-charts.git
+URL := https://hyphengroup.github.io/helm-charts/
 
 
 help: ## List targets & descriptions
