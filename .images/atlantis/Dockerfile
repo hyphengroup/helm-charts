@@ -12,8 +12,8 @@ RUN TERRAGRUNT_VERSIONS="0.21.13 0.22.5 0.23.40 0.24.4 0.25.5 0.26.7 0.27.4 0.28
         chmod +x terragrunt_linux_amd64 && \
         mkdir -p /usr/local/bin/tg/versions/${VERSION} && \
         mv terragrunt_linux_amd64 /usr/local/bin/tg/versions/${VERSION}/terragrunt && \
-        ln -s /usr/local/bin/tg/versions/${VERSION}/terragrunt /usr/local/bin/terragrunt${VERSION} && \
+        ln -fsv /usr/local/bin/tg/versions/${VERSION}/terragrunt /usr/local/bin/terragrunt${VERSION} && \
         rm SHA256SUMS; \
     done && \
-    ln -s /usr/local/bin/tg/versions/${DEFAULT_TERRAGRUNT_VERSION}/terragrunt /usr/local/bin/terragrunt
+    ln -sv /usr/local/bin/tg/versions/${DEFAULT_TERRAGRUNT_VERSION}/terragrunt /usr/local/bin/terragrunt
 
