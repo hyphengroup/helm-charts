@@ -51,6 +51,8 @@ spec:
             - "--search-offered-resource-types={{ .Values.config.search.offeredResourceTypes }}"
             - "--search-max-concurrency={{ .Values.config.search.maxConcurrency }}"
             - "--default-label-columns={{ .Values.config.defaultLabelColumns }}"
+            - "--default-hidden-columns={{ .Values.config.defaultHiddenColumns }}"
+            - "--default-custom-columns={{ .Values.config.defaultCustomColumns }}"
             - "--object-links={{ .Values.config.objectLinks }}"
             {{- if .Values.config.showContainerLogs }}
             - "--show-container-logs"

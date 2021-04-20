@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: hjacobs/kube-web-view
   # see https://codeberg.org/hjacobs/kube-web-view/releases
-  tag: 19.8.3
+  tag: 21.2.0
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP
@@ -30,14 +30,16 @@ ingress:
   #     hosts:
   #       - kube-web-view.internal.swatmobile.io
 config:
-  defaultLabelColumns: pods=release;deployments=release;nodes=beta.kubernetes.io/instance-type,failure-domain.beta.kubernetes.io/zone
+  defaultLabelColumns: pods=release;deployments=release;nodes=beta.kubernetes.io/instance-type,failure-domain.beta.kubernetes.io/zone,node.cag.systems/lifecycle,node.cag.systems/role
+  defaultHiddenColumns: Nominated Node,Readiness Gates
+  defaultCustomColumns: pods=Images=spec.containers[*].image;;deployments=Strategy=spec.strategy
   objectLinks: nodes=https://app.datadoghq.com/infrastructure?filter={name},pods=https://app.datadoghq.com/process?tags=pod_name%3A{name}%2Ckubernetescluster%3A{cluster},daemonsets=https://app.datadoghq.com/containers?tags=kubernetescluster%3A{cluster}%2Ckube_daemon_set%3A{name},deployments=https://app.datadoghq.com/containers?tags=kubernetescluster%3A{cluster}%2Ckube_deployment%3A{name}
   showContainerLogs: false
   # Enable showSecrets unhide secret data
   # see also https://kube-web-view.readthedocs.io/en/latest/security.html
   showSecrets: false
   sidebar:
-    resourceTypes: Cluster Resources=namespaces,nodes,persistentvolumes;Controllers=deployments,cronjobs,jobs,daemonsets,statefulsets,certificates,orders,challenges;Pod Management=ingresses,services,pods,configmaps,horizontalpodautoscalers,limitranges
+    resourceTypes: Cluster Resources=namespaces,nodes,persistentvolumes;Controllers=deployments,cronjobs,jobs,daemonsets,statefulsets,certificates,orders,challenges,;Pod Management=ingresses,services,gateways,virtualservices,destinationrules,pods,sopssecrets,configmaps,horizontalpodautoscalers,limitranges
   search:
     defaultResourceTypes: namespaces,deployments,services,ingresses,statefulsets,cronjobs
     offeredResourceTypes: namespaces,deployments,replicasets,services,ingresses,daemonsets,statefulsets,cronjobs,pods,nodes

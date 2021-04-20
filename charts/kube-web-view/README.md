@@ -9,7 +9,7 @@ Define kube config under `.secrets.config`
 To install the chart with the release name my-release:
 
 ```console
-$ helm install --name=my-release swat/kube-web-view
+$ helm install --name=my-release ./kube-web-view
 ```
 
 The command deploys Kubernetes Web View on the Kubernetes cluster in the default configuration.
