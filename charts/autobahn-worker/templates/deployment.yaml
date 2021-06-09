@@ -44,6 +44,8 @@ spec:
           env:
           - name: PYTHONIOENCODING
             value: "utf-8"
+          args:
+          - "configuration/host/extern/default.json"
           volumeMounts:
             - name: secrets
               mountPath: /usr/src/app/configuration/host/extern
