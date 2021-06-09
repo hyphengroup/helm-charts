@@ -1,0 +1,28 @@
+# Declare variables to be passed into your templates.
+replicaCount: 1
+image:
+  repository: private.ecr.ap-southeast-1.amazonaws.com/autobahn/worker
+  # see https://codeberg.org/hjacobs/kube-web-view/releases
+  tag: stable
+  pullPolicy: Always
+resources: {}
+  # limits:
+  #   memory: 100Mi
+  # requests:
+  #   cpu: 5m
+  #   memory: 100Mi
+
+# ensure emtpyDir doesn't block autoscaler
+podAnnotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+affinity: {}
+tolerations: []
+
+# ref to the secret which contains the config
+secretRef: autobahn-secret
+
+# Add securityContext
+securityContext: {}
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
