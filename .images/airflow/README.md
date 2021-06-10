@@ -2,6 +2,10 @@
 
 This repository contains forked **Dockerfile** of [apache-airflow](https://github.com/apache/incubator-airflow) from puckel/docker-airflow
 
+## Changelog
+
+- Bump to 1.10.15 - https://github.com/apache/airflow/releases/tag/1.10.15
+
 ## Informations
 
 * Based on Python (3.7-slim-stretch) official Image [python:3.7-slim-stretch](https://hub.docker.com/_/python/)
@@ -110,3 +114,5 @@ In order to incorporate plugins into your docker container
 - Create a file "requirements.txt" with the desired python modules
 - Mount this file as a volume `-v $(pwd)/requirements.txt:/requirements.txt` (or add it as a volume in docker-compose file)
 - You may mount a custom entrypoint.sh script to execute the pip install command (with --user option)
+
+#
