@@ -1,7 +1,7 @@
 apiVersion: v1
 description: Airflow running with KubernetesExecutor, git-sync and logs to s3
 name: airflow-kube-s3
-version: 0.0.13
+version: 0.0.14
 appVersion: 1.10.14
 icon: https://usr/local/airflow.apache.org/_images/pin_large.png
 home: https://usr/local/airflow.apache.org/

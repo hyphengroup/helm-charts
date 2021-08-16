@@ -84,6 +84,9 @@ spec:
             - name: airflow-config
               mountPath: /usr/local/airflow/airflow.cfg
               subPath: airflow.cfg
+            - name: airflow-config
+              mountPath: /usr/local/airflow/airflow_local_settings.py
+              subPath: airflow_local_settings.py
             {{- if .Values.airflow.rbac.enabled }}
             - name: webserver-config
               mountPath: /usr/local/airflow/webserver_config.py

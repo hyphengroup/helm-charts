@@ -241,3 +241,11 @@ serviceAccount:
   # ## The name of the ServiceAccount to use.
   # ## If not set and create is true, a name is generated using the fullname template
   name:
+
+airflowLocalSettings: {}
+xcomSidecar:
+  image: alpine:3.14
+  cpuRequest: 1m
+  cpuLimit: 10m
+  memoryRequest: 512Ki
+  memoryLimit: 1024Ki
