@@ -3,7 +3,26 @@ entries:
   airflow-kube-s3:
   - apiVersion: v1
     appVersion: 1.10.14
-    created: "2021-08-16T17:00:21.841689+08:00"
+    created: "2021-08-17T15:33:14.535118+08:00"
+    description: Airflow running with KubernetesExecutor, git-sync and logs to s3
+    digest: 54e3caa7203d3501330a6a0bbcc6dfca5042d8092f5c093493b20b33ac412568
+    home: https://usr/local/airflow.apache.org/
+    icon: https://usr/local/airflow.apache.org/_images/pin_large.png
+    keywords:
+    - workflow
+    - airflow
+    - dag
+    - aws
+    - git-sync
+    name: airflow-kube-s3
+    sources:
+    - https://usr/local/airflow.apache.org/
+    urls:
+    - https://hyphengroup.github.io/helm-charts/airflow-kube-s3-0.0.15.tgz
+    version: 0.0.15
+  - apiVersion: v1
+    appVersion: 1.10.14
+    created: "2021-08-17T15:33:14.533928+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: efd55d8204f3ebecea105992d93606e7333f9f08b60ddd5665c26f96fa0416e2
     home: https://usr/local/airflow.apache.org/
@@ -22,7 +41,7 @@ entries:
     version: 0.0.14
   - apiVersion: v1
     appVersion: 1.10.14
-    created: "2021-08-16T17:00:21.84052+08:00"
+    created: "2021-08-17T15:33:14.532742+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: cafd2392c8a1393f69fc4ccd2288fda6ea048563c09adf5b91468a3865eb2c14
     home: https://usr/local/airflow.apache.org/
@@ -41,7 +60,7 @@ entries:
     version: 0.0.13
   - apiVersion: v1
     appVersion: 1.10.14
-    created: "2021-08-16T17:00:21.839201+08:00"
+    created: "2021-08-17T15:33:14.531398+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: b829be4497f56473bfb4ee0459e598b2e174c404eba9e54806b5ef46cba3f09d
     home: https://usr/local/airflow.apache.org/
@@ -60,7 +79,7 @@ entries:
     version: 0.0.12
   - apiVersion: v1
     appVersion: 1.10.14
-    created: "2021-08-16T17:00:21.837822+08:00"
+    created: "2021-08-17T15:33:14.529915+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: c139515017dea448081c48b5b87b19dd6e60c9acfca8f647d22dbefa5599def4
     home: https://usr/local/airflow.apache.org/
@@ -79,7 +98,7 @@ entries:
     version: 0.0.11
   - apiVersion: v1
     appVersion: 1.10.14
-    created: "2021-08-16T17:00:21.836354+08:00"
+    created: "2021-08-17T15:33:14.527585+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: e825c0040f00fce461bc9fce90c89607d7fd24e5ae80e5883d7b84fb0224f770
     home: https://usr/local/airflow.apache.org/
@@ -98,7 +117,7 @@ entries:
     version: 0.0.10
   - apiVersion: v1
     appVersion: 1.10.14
-    created: "2021-08-16T17:00:21.859616+08:00"
+    created: "2021-08-17T15:33:14.556369+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: ac47f6df183cbe46614dc093cdb9184f62e239fa5ab1a08042c66d8cbd793c07
     home: https://usr/local/airflow.apache.org/
@@ -117,7 +136,7 @@ entries:
     version: 0.0.9
   - apiVersion: v1
     appVersion: 1.10.14
-    created: "2021-08-16T17:00:21.858444+08:00"
+    created: "2021-08-17T15:33:14.554969+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 59e83f937525c68ad4975abe86dc16e50387b5732f2e23abdf52be4426aa39b3
     home: https://usr/local/airflow.apache.org/
@@ -136,7 +155,7 @@ entries:
     version: 0.0.8
   - apiVersion: v1
     appVersion: 1.10.14
-    created: "2021-08-16T17:00:21.857275+08:00"
+    created: "2021-08-17T15:33:14.553487+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 42a9931f4639701ceafb0f459e963881e18392b3f451203c4b00840f77ac221d
     home: https://usr/local/airflow.apache.org/
@@ -155,7 +174,7 @@ entries:
     version: 0.0.7
   - apiVersion: v1
     appVersion: 1.10.14
-    created: "2021-08-16T17:00:21.855484+08:00"
+    created: "2021-08-17T15:33:14.551386+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 395038a4af0a1fee90aa57aaa940fbf772fa5156639bb89faaaf69af7bcdf40c
     home: https://usr/local/airflow.apache.org/
@@ -174,7 +193,7 @@ entries:
     version: 0.0.6
   - apiVersion: v1
     appVersion: 1.10.14
-    created: "2021-08-16T17:00:21.854553+08:00"
+    created: "2021-08-17T15:33:14.550237+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: da06a7a48156e7c77748c12fb182a35addccd31e5caa8d3c206b057253abcefc
     home: https://usr/local/airflow.apache.org/
@@ -193,7 +212,7 @@ entries:
     version: 0.0.5
   - apiVersion: v1
     appVersion: 1.10.9
-    created: "2021-08-16T17:00:21.853388+08:00"
+    created: "2021-08-17T15:33:14.54889+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 4d7357922c96fd84438f7b4c863f340cb1f24b55ddf709d622a2ac24941a5b6c
     home: https://usr/local/airflow.apache.org/
@@ -212,7 +231,7 @@ entries:
     version: 0.0.4
   - apiVersion: v1
     appVersion: 1.10.9
-    created: "2021-08-16T17:00:21.852454+08:00"
+    created: "2021-08-17T15:33:14.547797+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 4465b903c1ce1cc9cfd15a50cf622e44de19116c8d959060f7d414e17c01c39c
     home: https://usr/local/airflow.apache.org/
@@ -231,64 +250,7 @@ entries:
     version: 0.0.3
   - apiVersion: v1
     appVersion: 1.10.9
-    created: "2021-08-16T17:00:21.848834+08:00"
-    description: Airflow running with KubernetesExecutor, git-sync and logs to s3
-    digest: 710adbf3ee13a5321620a148212977ca7404b00c25fb2d1a9e228f8290f7af02
-    home: https://usr/local/airflow.apache.org/
-    icon: https://usr/local/airflow.apache.org/_images/pin_large.png
-    keywords:
-    - workflow
-    - airflow
-    - dag
-    - aws
-    - git-sync
-    name: airflow-kube-s3
-    sources:
-    - https://usr/local/airflow.apache.org/
-    urls:
-    - https://hyphengroup.github.io/helm-charts/airflow-kube-s3-0.0.3-alpha+004.tgz
-    version: 0.0.3-alpha+004
-  - apiVersion: v1
-    appVersion: 1.10.9
-    created: "2021-08-16T17:00:21.851291+08:00"
-    description: Airflow running with KubernetesExecutor, git-sync and logs to s3
-    digest: ece29ad46997cb0c3ee12e05ab65008e234cea619c17d3debda43192a35310f7
-    home: https://usr/local/airflow.apache.org/
-    icon: https://usr/local/airflow.apache.org/_images/pin_large.png
-    keywords:
-    - workflow
-    - airflow
-    - dag
-    - aws
-    - git-sync
-    name: airflow-kube-s3
-    sources:
-    - https://usr/local/airflow.apache.org/
-    urls:
-    - https://hyphengroup.github.io/helm-charts/airflow-kube-s3-0.0.3-alpha+006.tgz
-    version: 0.0.3-alpha+006
-  - apiVersion: v1
-    appVersion: 1.10.9
-    created: "2021-08-16T17:00:21.850109+08:00"
-    description: Airflow running with KubernetesExecutor, git-sync and logs to s3
-    digest: 2c67adda73b0b78705d9b14419f9d4027074058585de8d492591d1fdedd1b5e5
-    home: https://usr/local/airflow.apache.org/
-    icon: https://usr/local/airflow.apache.org/_images/pin_large.png
-    keywords:
-    - workflow
-    - airflow
-    - dag
-    - aws
-    - git-sync
-    name: airflow-kube-s3
-    sources:
-    - https://usr/local/airflow.apache.org/
-    urls:
-    - https://hyphengroup.github.io/helm-charts/airflow-kube-s3-0.0.3-alpha+005.tgz
-    version: 0.0.3-alpha+005
-  - apiVersion: v1
-    appVersion: 1.10.9
-    created: "2021-08-16T17:00:21.84688+08:00"
+    created: "2021-08-17T15:33:14.541986+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 93ca1d3ce73a3edd2743ae5cfeeb5aa06a448651e55c4c7c9d89f73803ebfe44
     home: https://usr/local/airflow.apache.org/
@@ -307,7 +269,64 @@ entries:
     version: 0.0.3-alpha+003
   - apiVersion: v1
     appVersion: 1.10.9
-    created: "2021-08-16T17:00:21.845434+08:00"
+    created: "2021-08-17T15:33:14.546466+08:00"
+    description: Airflow running with KubernetesExecutor, git-sync and logs to s3
+    digest: ece29ad46997cb0c3ee12e05ab65008e234cea619c17d3debda43192a35310f7
+    home: https://usr/local/airflow.apache.org/
+    icon: https://usr/local/airflow.apache.org/_images/pin_large.png
+    keywords:
+    - workflow
+    - airflow
+    - dag
+    - aws
+    - git-sync
+    name: airflow-kube-s3
+    sources:
+    - https://usr/local/airflow.apache.org/
+    urls:
+    - https://hyphengroup.github.io/helm-charts/airflow-kube-s3-0.0.3-alpha+006.tgz
+    version: 0.0.3-alpha+006
+  - apiVersion: v1
+    appVersion: 1.10.9
+    created: "2021-08-17T15:33:14.545071+08:00"
+    description: Airflow running with KubernetesExecutor, git-sync and logs to s3
+    digest: 2c67adda73b0b78705d9b14419f9d4027074058585de8d492591d1fdedd1b5e5
+    home: https://usr/local/airflow.apache.org/
+    icon: https://usr/local/airflow.apache.org/_images/pin_large.png
+    keywords:
+    - workflow
+    - airflow
+    - dag
+    - aws
+    - git-sync
+    name: airflow-kube-s3
+    sources:
+    - https://usr/local/airflow.apache.org/
+    urls:
+    - https://hyphengroup.github.io/helm-charts/airflow-kube-s3-0.0.3-alpha+005.tgz
+    version: 0.0.3-alpha+005
+  - apiVersion: v1
+    appVersion: 1.10.9
+    created: "2021-08-17T15:33:14.543719+08:00"
+    description: Airflow running with KubernetesExecutor, git-sync and logs to s3
+    digest: 710adbf3ee13a5321620a148212977ca7404b00c25fb2d1a9e228f8290f7af02
+    home: https://usr/local/airflow.apache.org/
+    icon: https://usr/local/airflow.apache.org/_images/pin_large.png
+    keywords:
+    - workflow
+    - airflow
+    - dag
+    - aws
+    - git-sync
+    name: airflow-kube-s3
+    sources:
+    - https://usr/local/airflow.apache.org/
+    urls:
+    - https://hyphengroup.github.io/helm-charts/airflow-kube-s3-0.0.3-alpha+004.tgz
+    version: 0.0.3-alpha+004
+  - apiVersion: v1
+    appVersion: 1.10.9
+    created: "2021-08-17T15:33:14.539161+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: eff3f12c6f87d7a6b283b261759cc2951f743753875cbf65d5f0e2e11eb54e80
     home: https://usr/local/airflow.apache.org/
@@ -326,7 +345,7 @@ entries:
     version: 0.0.3-alpha+002
   - apiVersion: v1
     appVersion: 1.10.9
-    created: "2021-08-16T17:00:21.844094+08:00"
+    created: "2021-08-17T15:33:14.537667+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 3b90b060b91ed5da481ec13bac570211d9faa42317bb1fbb377befbef1390091
     home: https://usr/local/airflow.apache.org/
@@ -345,7 +364,7 @@ entries:
     version: 0.0.3-alpha+001
   - apiVersion: v1
     appVersion: 1.10.7
-    created: "2021-08-16T17:00:21.842716+08:00"
+    created: "2021-08-17T15:33:14.536269+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: a3a31de284bd0fc17e2fa7225aa773a11857d7f9ee3c5e0be01328251bcbf052
     home: https://usr/local/airflow.apache.org/
@@ -364,7 +383,7 @@ entries:
     version: 0.0.2
   - apiVersion: v1
     appVersion: 1.10.7
-    created: "2021-08-16T17:00:21.833859+08:00"
+    created: "2021-08-17T15:33:14.526004+08:00"
     description: Airflow running with KubernetesExecutor, git-sync and logs to s3
     digest: 87bd47f39d58e3f2a33599a6d73e1df13913b79d5297655c496c0906acc6a0f5
     home: https://usr/local/airflow.apache.org/
@@ -384,7 +403,7 @@ entries:
   argocd-notifications:
   - apiVersion: v1
     appVersion: 0.7.0
-    created: "2021-08-16T17:00:21.860236+08:00"
+    created: "2021-08-17T15:33:14.557132+08:00"
     description: A Helm chart for ArgoCD notifications, an add-on to ArgoCD.
     digest: 1bfba867d80ba3e56c552618d0170643a951746e009a86808e3cdadc2d77e465
     home: https://github.com/argoproj/argo-helm
@@ -403,7 +422,7 @@ entries:
   autobahn-worker:
   - apiVersion: v1
     appVersion: 1.0.40
-    created: "2021-08-16T17:00:21.860736+08:00"
+    created: "2021-08-17T15:33:14.557816+08:00"
     description: Autobahn internal scanner
     digest: fafdd78aa92bab5eea6d0eb969cae97d7a359b08f51ff4adbfd938aa75256826
     name: autobahn-worker
@@ -412,7 +431,7 @@ entries:
     version: 0.1.1
   - apiVersion: v1
     appVersion: 1.0.40
-    created: "2021-08-16T17:00:21.860479+08:00"
+    created: "2021-08-17T15:33:14.557496+08:00"
     description: Autobahn internal scanner
     digest: 3b019ce0adca44ab2846d84608ba7dbbe3fe004f74d9e038e943d764ce887750
     name: autobahn-worker
@@ -422,7 +441,7 @@ entries:
   ecr-proxy:
   - apiVersion: v1
     appVersion: v0.1.0
-    created: "2021-08-16T17:00:21.861142+08:00"
+    created: "2021-08-17T15:33:14.55839+08:00"
     description: ECR Proxy
     digest: 18ecef2e7683517f8b33616ac799c601b1633d59c8b0b90ac78f3d019edc450b
     name: ecr-proxy
@@ -432,7 +451,7 @@ entries:
   istio:
   - apiVersion: v1
     appVersion: 1.4.3
-    created: "2021-08-16T17:00:21.885886+08:00"
+    created: "2021-08-17T15:33:14.586677+08:00"
     dependencies:
     - condition: sidecarInjectorWebhook.enabled
       name: sidecarInjectorWebhook
@@ -504,7 +523,7 @@ entries:
     version: 1.4.3
   - apiVersion: v1
     appVersion: 1.4.2
-    created: "2021-08-16T17:00:21.87748+08:00"
+    created: "2021-08-17T15:33:14.577125+08:00"
     dependencies:
     - condition: sidecarInjectorWebhook.enabled
       name: sidecarInjectorWebhook
@@ -576,7 +595,7 @@ entries:
     version: 1.4.2
   - apiVersion: v1
     appVersion: 1.4.0
-    created: "2021-08-16T17:00:21.869214+08:00"
+    created: "2021-08-17T15:33:14.568042+08:00"
     dependencies:
     - condition: sidecarInjectorWebhook.enabled
       name: sidecarInjectorWebhook
@@ -649,7 +668,7 @@ entries:
   kube-node-lifecycle-labeller:
   - apiVersion: v1
     appVersion: 1.15.3-1
-    created: "2021-08-16T17:00:21.88694+08:00"
+    created: "2021-08-17T15:33:14.587152+08:00"
     description: The lifecycle labeller fetches the LifeCycle attribute of a node
       and conditionally adds labels and taints based on EC2 lifecycle.
     digest: d83f10a04a249760b34ad27610120f1dbcaadcd8d1fc312b95c47562497ff8d6
@@ -670,7 +689,7 @@ entries:
   kube-ops-view:
   - apiVersion: v1
     appVersion: "0.12"
-    created: "2021-08-16T17:00:21.890083+08:00"
+    created: "2021-08-17T15:33:14.590793+08:00"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -696,7 +715,7 @@ entries:
     version: 1.3.1
   - apiVersion: v1
     appVersion: "0.12"
-    created: "2021-08-16T17:00:21.888568+08:00"
+    created: "2021-08-17T15:33:14.588981+08:00"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -723,7 +742,7 @@ entries:
   kube-web-view:
   - apiVersion: v1
     appVersion: 21.2.0
-    created: "2021-08-16T17:00:21.891003+08:00"
+    created: "2021-08-17T15:33:14.592088+08:00"
     description: Kubernetes Web View to list and view all Kubernetes resources
     digest: f4b72d0b83a2462c66c7d668b923a5fac3d5bfed236392c985c84fd91e6f55c7
     home: https://kube-web-view.readthedocs.io/
@@ -742,7 +761,7 @@ entries:
     version: 0.3.0
   - apiVersion: v1
     appVersion: 19.8.3
-    created: "2021-08-16T17:00:21.890543+08:00"
+    created: "2021-08-17T15:33:14.591413+08:00"
     description: Kubernetes Web View to list and view all Kubernetes resources
     digest: bb85cfe2e49da37f72c16f79e9e39ccb6bc816e94cac9df79fb59d9e1b1670f5
     home: https://kube-web-view.readthedocs.io/
@@ -762,7 +781,7 @@ entries:
   private-charts-repo:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-08-16T17:00:21.891668+08:00"
+    created: "2021-08-17T15:33:14.592983+08:00"
     description: Nodejs http server clones a private GitHub or BitBucket repo and
       serves the files.
     digest: 2d86983799d5006f0b2db398e9f200d240733152fc656233e524c4ac495a0092
@@ -772,7 +791,7 @@ entries:
     version: 0.0.3
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-08-16T17:00:21.891434+08:00"
+    created: "2021-08-17T15:33:14.592719+08:00"
     description: Nodejs http server clones a private GitHub or BitBucket repo and
       serves the files.
     digest: d34e89ab02ab84778a4731898824a95b1b181cc480b27943fb2042d1c480f5ca
@@ -782,7 +801,7 @@ entries:
     version: 0.0.2
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-08-16T17:00:21.891225+08:00"
+    created: "2021-08-17T15:33:14.592466+08:00"
     description: Nodejs http server clones a private GitHub or BitBucket repo and
       serves the files.
     digest: 4481997b5e65798b69b21e4bc5af228f3cfaed7c21685438de653abf752a9c77
@@ -793,7 +812,7 @@ entries:
   sops-secrets-operator:
   - apiVersion: v1
     appVersion: 0.0.10
-    created: "2021-08-16T17:00:21.892531+08:00"
+    created: "2021-08-17T15:33:14.593955+08:00"
     description: sops secrets operator
     digest: c408116eb891fc932e7e6591e265f58af6977c9e817f00f887b4633cf04192ab
     maintainers:
@@ -807,7 +826,7 @@ entries:
     version: 0.1.11
   - apiVersion: v1
     appVersion: 0.0.10
-    created: "2021-08-16T17:00:21.892113+08:00"
+    created: "2021-08-17T15:33:14.593492+08:00"
     description: sops secrets operator
     digest: ceb5cc87d4093d00569d25a40e0407a3d879866b2e6aa730b030f6983cb36bb8
     maintainers:
@@ -821,7 +840,7 @@ entries:
     version: 0.1.10
   - apiVersion: v1
     appVersion: 0.0.9
-    created: "2021-08-16T17:00:21.892922+08:00"
+    created: "2021-08-17T15:33:14.594397+08:00"
     description: sops secrets operator
     digest: f46e2f0f9924663393feea5d56670c63165ec6e953f4a891892630de267702ea
     maintainers:
@@ -833,4 +852,4 @@ entries:
     urls:
     - https://hyphengroup.github.io/helm-charts/sops-secrets-operator-0.1.8.tgz
     version: 0.1.8
-generated: "2021-08-16T17:00:21.832531+08:00"
+generated: "2021-08-17T15:33:14.524352+08:00"
