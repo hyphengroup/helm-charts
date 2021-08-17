@@ -21,6 +21,7 @@ import os
 from typing import Dict, Any
 
 import six
+import kubernetes.client.models as k8s
 
 from airflow import AirflowException
 from airflow.configuration import conf
