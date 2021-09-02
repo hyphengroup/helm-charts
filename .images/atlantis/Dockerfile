@@ -4,7 +4,7 @@ ARG DEFAULT_TERRAGRUNT_VERSION
 
 # Download Terragrunt
 # Latest patch versions are included
-RUN TERRAGRUNT_VERSIONS="0.21.13 0.22.5 0.23.40 0.24.4 0.25.5 0.26.7 0.27.4 0.28.7 ${DEFAULT_TERRAGRUNT_VERSION}" && \
+RUN TERRAGRUNT_VERSIONS="0.23.40 0.28.7 0.28.24 0.31.8 ${DEFAULT_TERRAGRUNT_VERSION}" && \
     for VERSION in ${TERRAGRUNT_VERSIONS}; do \
         curl -LOs https://github.com/gruntwork-io/terragrunt/releases/download/v${VERSION}/terragrunt_linux_amd64 && \
         curl -LOs https://github.com/gruntwork-io/terragrunt/releases/download/v${VERSION}/SHA256SUMS && \
@@ -17,3 +17,10 @@ RUN TERRAGRUNT_VERSIONS="0.21.13 0.22.5 0.23.40 0.24.4 0.25.5 0.26.7 0.27.4 0.28
     done && \
     ln -sv /usr/local/bin/tg/versions/${DEFAULT_TERRAGRUNT_VERSION}/terragrunt /usr/local/bin/terragrunt
 
+# Download terragrunt-atlantis-config
+ARG TERRAGRUNT_ATLANTIS_CONFIG_VERSION
+RUN curl -LOs https://github.com/transcend-io/terragrunt-atlantis-config/releases/download/v${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}/terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64.tar.gz && \
+  tar zxf terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64.tar.gz && \
+  chmod +x terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64/terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64 && \
+  mv terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64/terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64 /usr/local/bin/terragrunt-atlantis-config && \
+  rm -rf terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64
