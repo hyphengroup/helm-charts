@@ -9,11 +9,11 @@ VERSION:=0.0.11
 TAG:=$(ECR_REGISTRY_URL)/$(ECR_REPO):$(VERSION)
 
 build: Dockerfile
-  docker build --rm \
-    --build-arg ATLANTIS_VERSION=$(ATLANTIS_VERSION) \
-    --build-arg DEFAULT_TERRAGRUNT_VERSION=$(TERRAGRUNT_VERSION) \
-    --build-arg TERRAGRUNT_ATLANTIS_CONFIG_VERSION=$(TERRAGRUNT_ATLANTIS_CONFIG_VERSION) \
-    -t $(TAG) .
+	docker build --rm \
+		--build-arg ATLANTIS_VERSION=$(ATLANTIS_VERSION) \
+		--build-arg DEFAULT_TERRAGRUNT_VERSION=$(TERRAGRUNT_VERSION) \
+		--build-arg TERRAGRUNT_ATLANTIS_CONFIG_VERSION=$(TERRAGRUNT_ATLANTIS_CONFIG_VERSION) \
+		-t $(TAG) .
 
 docker/login:
 	$$(aws ecr get-login --no-include-email --region $(ECR_REGION))
