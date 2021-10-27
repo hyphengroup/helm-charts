@@ -28,6 +28,7 @@ RUN curl -LOs https://github.com/transcend-io/terragrunt-atlantis-config/release
 # Download Terraform provider for teleport
 ARG TELEPORT_VERSION
 RUN TELEPORT_PLATFORMS="linux darwin" && \
+  apk add --no-cache libc6-compat && \
   for PLATFORM in ${TELEPORT_PLATFORMS}; do \
     mkdir -p /home/atlantis/.terraform.d/plugins/gravitational.com/teleport/teleport/${TELEPORT_VERSION}/${PLATFORM}_amd64 && \
     curl -LOs https://get.gravitational.com/terraform-provider-teleport-v${TELEPORT_VERSION}-${PLATFORM}-amd64-bin.tar.gz && \
