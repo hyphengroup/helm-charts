@@ -27,7 +27,7 @@ RUN curl -LOs https://github.com/transcend-io/terragrunt-atlantis-config/release
 
 # Download Terraform provider for teleport
 ARG TELEPORT_VERSION
-RUN mkdir -p ${HOME?}/.terraform.d/plugins/gravitational.com/teleport/teleport/${TELEPORT_VERSION}/linux_amd64 && \
+RUN mkdir -p /home/atlantis/.terraform.d/plugins/gravitational.com/teleport/teleport/${TELEPORT_VERSION}/linux_amd64 && \
   curl -L -O https://get.gravitational.com/terraform-provider-teleport-v${TELEPORT_VERSION}-linux-amd64-bin.tar.gz && \
-  tar -zxvf terraform-provider-teleport-v${TELEPORT_VERSION}-linux-amd64-bin.tar.gz -C ${HOME?}/.terraform.d/plugins/gravitational.com/teleport/teleport/${TELEPORT_VERSION}/linux_amd64 && \
+  tar -zxvf terraform-provider-teleport-v${TELEPORT_VERSION}-linux-amd64-bin.tar.gz -C /home/atlantis/.terraform.d/plugins/gravitational.com/teleport/teleport/${TELEPORT_VERSION}/linux_amd64 && \
   rm terraform-provider-teleport-v${TELEPORT_VERSION}-linux-amd64-bin.tar.gz
