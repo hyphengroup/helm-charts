@@ -9,7 +9,7 @@ ENV TGENV_AUTO_INSTALL=true
 RUN \
   git clone --depth=1 https://github.com/tfutils/tfenv.git /home/atlantis/.tfenv && \
   ln -sfv /home/atlantis/.tfenv/bin/* /usr/local/bin && \
-  echo "(terraform version | head -1 | awk '{print $2}' | sed 's/^v//')" >/home/atlantis/.terraform-version && \
+  echo "$(terraform version | head -1 | awk '{print $2}' | sed 's/^v//')" >/home/atlantis/.terraform-version && \
   git clone --depth=1 https://github.com/taosmountain/tgenv.git /home/atlantis/.tgenv && \
   ln -sfv /home/atlantis/.tgenv/bin/* /usr/local/bin && \
   echo "${DEFAULT_TERRAGRUNT_VERSION}" >/home/atlantis/.terragrunt-version
