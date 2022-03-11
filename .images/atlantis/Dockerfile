@@ -7,20 +7,21 @@ ENV TFENV_AUTO_INSTALL=true
 ENV TGENV_AUTO_INSTALL=true
 
 RUN \
+  default_version="$(terraform version | head -1 | awk '{print $2}' | sed 's/^v//')" && \
   git clone --depth=1 https://github.com/tfutils/tfenv.git /home/atlantis/.tfenv && \
   ln -sfv /home/atlantis/.tfenv/bin/* /usr/local/bin && \
-  echo "$(terraform version | head -1 | awk '{print $2}' | sed 's/^v//')" >/home/atlantis/.terraform-version && \
+  tfenv install "${default_version}" && \
+  echo "${default_version}" >/home/atlantis/.terraform-version && \
+  echo "${default_version}" >/home/atlantis/.tfenv/version
+
+RUN \
   git clone --depth=1 https://github.com/taosmountain/tgenv.git /home/atlantis/.tgenv && \
   ln -sfv /home/atlantis/.tgenv/bin/* /usr/local/bin && \
-  echo "${DEFAULT_TERRAGRUNT_VERSION}" >/home/atlantis/.terragrunt-version
-
-# Download Terragrunt
-# Latest patch versions are included
-RUN \
   for v in 0.23.40 0.28.7 0.28.24 0.31.8 "${DEFAULT_TERRAGRUNT_VERSION}"; do \
     tgenv install "${v}" || :; \
   done && \
-  tgenv use "${DEFAULT_TERRAGRUNT_VERSION}"
+  echo "${DEFAULT_TERRAGRUNT_VERSION}" >/home/atlantis/.terragrunt-version && \
+  echo "${DEFAULT_TERRAGRUNT_VERSION}" >/home/atlantis/.tgenv/version
 
 # Download terragrunt-atlantis-config
 ARG TERRAGRUNT_ATLANTIS_CONFIG_VERSION
@@ -40,3 +41,5 @@ RUN TELEPORT_PLATFORMS="linux darwin" && \
     tar -zxvf terraform-provider-teleport-v${TELEPORT_VERSION}-${PLATFORM}-amd64-bin.tar.gz -C /home/atlantis/.terraform.d/plugins/gravitational.com/teleport/teleport/${TELEPORT_VERSION}/${PLATFORM}_amd64 && \
     rm terraform-provider-teleport-v${TELEPORT_VERSION}-${PLATFORM}-amd64-bin.tar.gz; \
   done
+
+RUN chown -R atlantis:atlantis /home/atlantis
