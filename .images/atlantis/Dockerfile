@@ -2,20 +2,25 @@ ARG ATLANTIS_VERSION
 FROM runatlantis/atlantis:v${ATLANTIS_VERSION}
 ARG DEFAULT_TERRAGRUNT_VERSION
 
+# These should be the default but let's make sure.
+ENV TFENV_AUTO_INSTALL=true
+ENV TGENV_AUTO_INSTALL=true
+
+RUN \
+  git clone --depth=1 https://github.com/tfutils/tfenv.git /home/atlantis/.tfenv && \
+  ln -sfv /home/atlantis/.tfenv/bin/* /usr/local/bin && \
+  echo "(terraform version | head -1 | awk '{print $2}' | sed 's/^v//')" >/home/atlantis/.terraform-version && \
+  git clone --depth=1 https://github.com/taosmountain/tgenv.git /home/atlantis/.tgenv && \
+  ln -sfv /home/atlantis/.tgenv/bin/* /usr/local/bin && \
+  echo "${DEFAULT_TERRAGRUNT_VERSION}" >/home/atlantis/.terragrunt-version
+
 # Download Terragrunt
 # Latest patch versions are included
-RUN TERRAGRUNT_VERSIONS="0.23.40 0.28.7 0.28.24 0.31.8 ${DEFAULT_TERRAGRUNT_VERSION}" && \
-  for VERSION in ${TERRAGRUNT_VERSIONS}; do \
-    curl -LOs https://github.com/gruntwork-io/terragrunt/releases/download/v${VERSION}/terragrunt_linux_amd64 && \
-    curl -LOs https://github.com/gruntwork-io/terragrunt/releases/download/v${VERSION}/SHA256SUMS && \
-    sed -n "/terragrunt_linux_amd64/p" SHA256SUMS | sha256sum -c && \
-    chmod +x terragrunt_linux_amd64 && \
-    mkdir -p /usr/local/bin/tg/versions/${VERSION} && \
-    mv terragrunt_linux_amd64 /usr/local/bin/tg/versions/${VERSION}/terragrunt && \
-    ln -fsv /usr/local/bin/tg/versions/${VERSION}/terragrunt /usr/local/bin/terragrunt${VERSION} && \
-    rm SHA256SUMS; \
+RUN \
+  for v in 0.23.40 0.28.7 0.28.24 0.31.8 "${DEFAULT_TERRAGRUNT_VERSION}"; do \
+    tgenv install "${v}" || :; \
   done && \
-  ln -sv /usr/local/bin/tg/versions/${DEFAULT_TERRAGRUNT_VERSION}/terragrunt /usr/local/bin/terragrunt
+  tgenv use "${DEFAULT_TERRAGRUNT_VERSION}"
 
 # Download terragrunt-atlantis-config
 ARG TERRAGRUNT_ATLANTIS_CONFIG_VERSION
