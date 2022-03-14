@@ -1,5 +1,5 @@
 ARG ATLANTIS_VERSION
-FROM runatlantis/atlantis:v${ATLANTIS_VERSION}
+FROM ghcr.io/runatlantis/atlantis:v${ATLANTIS_VERSION}
 ARG DEFAULT_TERRAGRUNT_VERSION
 
 # These should be the default but let's make sure.
@@ -17,15 +17,14 @@ RUN \
 RUN \
   git clone --depth=1 https://github.com/taosmountain/tgenv.git /home/atlantis/.tgenv && \
   ln -sfv /home/atlantis/.tgenv/bin/* /usr/local/bin && \
-  for v in 0.23.40 0.28.7 0.28.24 0.31.8 "${DEFAULT_TERRAGRUNT_VERSION}"; do \
-    tgenv install "${v}" || :; \
-  done && \
+  tgenv install "${DEFAULT_TERRAGRUNT_VERSION}" && \
   echo "${DEFAULT_TERRAGRUNT_VERSION}" >/home/atlantis/.terragrunt-version && \
   echo "${DEFAULT_TERRAGRUNT_VERSION}" >/home/atlantis/.tgenv/version
 
 # Download terragrunt-atlantis-config
 ARG TERRAGRUNT_ATLANTIS_CONFIG_VERSION
-RUN curl -LOs https://github.com/transcend-io/terragrunt-atlantis-config/releases/download/v${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}/terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64.tar.gz && \
+RUN \
+  curl -LOs https://github.com/transcend-io/terragrunt-atlantis-config/releases/download/v${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}/terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64.tar.gz && \
   tar zxf terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64.tar.gz && \
   chmod +x terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64/terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64 && \
   mv terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64/terragrunt-atlantis-config_${TERRAGRUNT_ATLANTIS_CONFIG_VERSION}_linux_amd64 /usr/local/bin/terragrunt-atlantis-config && \
@@ -33,7 +32,8 @@ RUN curl -LOs https://github.com/transcend-io/terragrunt-atlantis-config/release
 
 # Download Terraform provider for teleport
 ARG TELEPORT_VERSION
-RUN TELEPORT_PLATFORMS="linux darwin" && \
+RUN \
+  TELEPORT_PLATFORMS="linux darwin" && \
   apk add --no-cache libc6-compat && \
   for PLATFORM in ${TELEPORT_PLATFORMS}; do \
     mkdir -p /home/atlantis/.terraform.d/plugins/gravitational.com/teleport/teleport/${TELEPORT_VERSION}/${PLATFORM}_amd64 && \
